@@ -78,10 +78,10 @@ distFile: org.apache.spark.rdd.RDD[String] = data.txt MapPartitionsRDD[10] at te
         support running on directories, compressed files, and wildcards as well. 
         For example, 
         you can use 
-        textFile("/my/directory"), 
-        textFile("/my/directory/*.txt"), 
-        and textFile("/my/directory/*.gz").
-    Apart from text files, 
+        textFile("/my/directory"), */
+//        textFile("/my/directory/*.txt"), 
+//        and textFile("/my/directory/*.gz").
+/*    Apart from text files, 
     Spark’s Scala API also supports several other data formats:
 
     - SparkContext.wholeTextFiles 
@@ -207,6 +207,11 @@ scala> sparkDF.select("URLs").head()
 res32: org.apache.spark.sql.Row = [https://github.com/bitly/data_hacks]
 scala> sparkDF.select("URLs").head().getString(0)
 res34: String = https://github.com/bitly/data_hacks
+scala> sparkDF.select("URLs").head().getAs[String]("URLs")
+res35: String = https://github.com/bitly/data_hacks
+scala> sparkDF.head().getAs[String]("URLs")
+res36: String = https://github.com/bitly/data_hacks
+
 scala> sparkDF.count()
 res33: Long = 100000
     */

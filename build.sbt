@@ -52,3 +52,5 @@ val sparkVersion = "2.2.0"
 libraryDependencies ++= Seq (
   "org.apache.spark" %% "spark-core" % sparkVersion//"2.2.0"
 )
+
+libraryDependencies += "com.47deg" %% "github4s" % "0.20.1"
