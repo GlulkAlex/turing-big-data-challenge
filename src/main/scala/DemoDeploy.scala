@@ -104,10 +104,34 @@ distFile: org.apache.spark.rdd.RDD[String] = data.txt MapPartitionsRDD[10] at te
         it offers an easy way to save any RDD.
     */
     /*
+    Transformations:
+    ---
+    pipe(command, [envVars])
+        Pipe each partition of the RDD 
+        through a shell command, 
+        e.g. a Perl or bash script. 
+        RDD elements are written to the process's stdin 
+        and lines output to its stdout 
+        are returned as an RDD of strings.
+    */
+    /*
     scala> val distFile_RDD = sc.textFile("../url_list.csv")
 distFile_RDD: org.apache.spark.rdd.RDD[String] = ../url_list.csv MapPartitionsRDD[1] at textFile at <console>:24
+    // Actions:
+    ---
 scala> distFile_RDD.take(1)
 res16: Array[String] = Array(URLs)
+
+scala> distFile.collect()
+res19: Array[String] = Array(URLs, https://github.com/bitly/data_hacks, https...
+scala> distFile.take(2)
+res21: Array[String] = Array(URLs, https://github.com/bitly/data_hacks)
+scala> distFile.take(2).drop(1)
+res22: Array[String] = Array(https://github.com/bitly/data_hacks)
+scala> distFile.take(2).drop(1)(0)
+res23: String = https://github.com/bitly/data_hacks
+scala> distFile.count()
+res24: Long = 100001
     */
     val rdd = sc.parallelize(text)
     /*
@@ -147,6 +171,61 @@ res16: Array[String] = Array(URLs)
         .load("../url_list.csv")
         //.load("/FileStore/tables/state_income-9f7c5.csv")
     //sparkDF: org.apache.spark.sql.DataFrame = [URLs: string]
+scala> val urls = sparkDF("URLs")
+urls: org.apache.spark.sql.Column = URLs
+scala> sparkDF.collect()
+res25: Array[org.apache.spark.sql.Row] = Array([https://github.com/bitly/data_hacks], ...
+scala> sparkDF.collect().head
+res26: org.apache.spark.sql.Row = [https://github.com/bitly/data_hacks]
+scala> sparkDF.first()
+res27: org.apache.spark.sql.Row = [https://github.com/bitly/data_hacks]
+scala> sparkDF.head(3)
+res28: Array[org.apache.spark.sql.Row] = Array([https://github.com/bitly/data_hacks], [https://github.com/kevinburke/hamms], [https://github.com/BugScanTeam/DNSLog])
+scala> sparkDF.show(3)
++--------------------+
+|                URLs|
++--------------------+
+|https://github.co...|
+|https://github.co...|
+|https://github.co...|
++--------------------+
+only showing top 3 rows
+
+scala> sparkDF.select("URLs")
+res30: org.apache.spark.sql.DataFrame = [URLs: string]
+scala> sparkDF.select("URLs").show(3)
++--------------------+
+|                URLs|
++--------------------+
+|https://github.co...|
+|https://github.co...|
+|https://github.co...|
++--------------------+
+only showing top 3 rows
+
+scala> sparkDF.select("URLs").head()
+res32: org.apache.spark.sql.Row = [https://github.com/bitly/data_hacks]
+scala> sparkDF.select("URLs").head().getString(0)
+res34: String = https://github.com/bitly/data_hacks
+scala> sparkDF.count()
+res33: Long = 100000
+    */
+    
+    /*
+    Spark is friendly to unit testing 
+    with any popular unit test framework. 
+    Simply create a SparkContext in your test 
+    with the master URL set to `local`, 
+    run your operations, 
+    and then 
+    call SparkContext.stop() 
+    to tear it down. 
+    Make sure 
+    you stop the context 
+    within a finally block 
+    or the test framework’s tearDown method, 
+    as Spark does not support two contexts running concurrently 
+    in the same program.
     */
     sc.stop()
   }
