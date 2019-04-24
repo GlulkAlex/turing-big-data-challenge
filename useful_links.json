@@ -3,13 +3,15 @@
 "https://github.com/monikturing/turing-data-challenge/blob/master/url_list.csv", 
 "https://raw.githubusercontent.com/monikturing/turing-data-challenge/master/url_list.csv", 
 
+"https://github.com/47deg/github4s/blob/master/docs/src/main/tut/auth.md",
 "https://github.com/47deg/github4s/blob/master/docs/src/main/tut/repository.md#get-contents", 
 "https://github.com/47deg/github4s/blob/master/github4s/shared/src/main/scala/github4s/free/domain/Repository.scala", 
 "https://github.com/47deg/fetch", 
 
+"https://developer.github.com/v3/repos/contents/#get-contents", 
+"https://developer.github.com/v3/repos/contents/#response-if-content-is-a-file",
 "https://developer.github.com/v3/repos/#response",
 "https://developer.github.com/v3/repos/contents/#get-archive-link", 
-"https://developer.github.com/v3/repos/contents/#get-contents", 
 "https://developer.github.com/v4/", 
 "https://developer.github.com/v4/#about-the-graphql-schema-reference", 
 "https://developer.github.com/v3/libraries/", 

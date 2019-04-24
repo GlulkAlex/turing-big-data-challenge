@@ -54,6 +54,28 @@ then got info for recursive tree traversal:
       "url": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa"
     }
 ...
+
+GET /repos/:owner/:repo/contents/:path
+"url": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md",
+https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py
+{
+  "name": "symbols.py",
+  "path": "symbols.py",
+  "sha": "248ffb14ea2899491d92f40c4d17586102604efa",
+  "size": 6824,
+  "url": "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py?ref=master",
+  "html_url": "https://github.com/pirate/crypto-trader/blob/master/symbols.py",
+  "git_url": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa",
+  "download_url": "https://raw.githubusercontent.com/pirate/crypto-trader/master/symbols.py",
+  "type": "file",
+  "content": "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py?ref=master",
+    "git": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa",
+    "html": "https://github.com/pirate/crypto-trader/blob/master/symbols.py"
+  }
+}
 */
 object GitHub_Repo_Content 
     extends App {
@@ -72,13 +94,53 @@ object GitHub_Repo_Content
     // scala.io.BufferedSource.
     //  getLines(): collection.Iterator[String]
     //  Returns an iterator who returns lines (NOT including newline character(s)).
-    val url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
+    val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
     // get JSON from github API
     val github_API_Response_Source = scala.io.Source
         //? required: java.net.URL
-        .fromURL(s = url, enc = "UTF8" )
+        .fromURL(s = master_Url, enc = "UTF8" )
     
-    println( github_API_Response_Source.mkString )
+    //>println( github_API_Response_Source.mkString )
+    val repo_Master_Tree_Root_URL: String = github_API_Response_Source
+        //?.getLines()
+        // startsWith(String prefix)
+        //.dropWhile( _.trim().startsWith("\"tree\"") )
+        .mkString
+// scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).filter( _.endsWith("}") ).head
+// res11: String = "url":"https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724"}
+// scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).drop(1 ).head
+// res12: String = "url":"https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724"}
+//scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).drop(1 ).head.drop(7).stripSuffix("\"}")
+//res13: String = https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724
+        // found   : Array[String]
+        .split(",")
+        .dropWhile( !_.startsWith("\"tree\"") )
+        .drop(1)
+        .head
+        .drop(7)
+        .stripSuffix("\"}")
+        
+    println( s"repo_Master_Tree_Root_URL: ${repo_Master_Tree_Root_URL}" )
+    // clean up ? releasing resource ? 
+    github_API_Response_Source.close()
+    
+    val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
+    case class File_Props(
+        name: String,//"symbols.py",
+        path: String,//"symbols.py",
+        size: Int,//6824,
+        type: String,//"file",
+        content: String,
+        //encoding: String//"base64",
+    )
+    // scala.io.BufferedSource
+    // buffered: collection.BufferedIterator[Char]
+    //  Creates a buffered iterator from this iterator.
+    //val repo_Master_Tree_Root_URL: String = github_API_Response_Source
+    def file_Props_Json_Parser(
+    ): File_Props = ???
+    
+    
     /*
     You can create a personal access token 
     and use it 
@@ -99,6 +161,7 @@ object GitHub_Repo_Content
     //accessToken:'Some(1...c)'
     //println(s"accessToken:'${accessToken}'")
     
+    if( 1 == 0 ){
     val getRepo = Github(accessToken)
         .repos.get(
         // the repository coordinates (owner and name of the repository).
@@ -267,7 +330,8 @@ Repository(
             case _ => println(s"""Unexpeced Github.repos.get():\n${r.result}""") 
         }
     }
-
+    }
+    
     /*
     Get contents
     This method returns 
@@ -282,6 +346,7 @@ Repository(
             Default: the repository’s default branch (usually master).
     To get contents: 
     */
+    if( 1 == 0 ){
     val getContents = Github(accessToken)
         .repos
         .getContents(
@@ -403,5 +468,6 @@ decode(src.getBytes(StandardCharsets.ISO_8859_1))
                 case _ => println(s"""Unexpeced Github.repos.getContents():\n${r.result}""") 
             }
         }
+    }
     }
 }
