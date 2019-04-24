@@ -57,26 +57,6 @@ then got info for recursive tree traversal:
 
 GET /repos/:owner/:repo/contents/:path
 "url": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md",
-https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py
-# prettified ( actual respons is without spaces and lines ):
-{
-  "name": "symbols.py",
-  "path": "symbols.py",
-  "sha": "248ffb14ea2899491d92f40c4d17586102604efa",
-  "size": 6824,
-  "url": "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py?ref=master",
-  "html_url": "https://github.com/pirate/crypto-trader/blob/master/symbols.py",
-  "git_url": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa",
-  "download_url": "https://raw.githubusercontent.com/pirate/crypto-trader/master/symbols.py",
-  "type": "file",
-  "content": "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\n",
-  "encoding": "base64",
-  "_links": {
-    "self": "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py?ref=master",
-    "git": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa",
-    "html": "https://github.com/pirate/crypto-trader/blob/master/symbols.py"
-  }
-}
 */
 object GitHub_Repo_Content 
     extends App {
@@ -126,6 +106,29 @@ object GitHub_Repo_Content
     github_API_Response_Source.close()
     
     val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
+    
+    // https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py
+//# prettified ( actual respons is without spaces and lines ):
+val test_Input = """{
+  "name": "symbols.py",
+  "path": "symbols.py",
+  "sha": "248ffb14ea2899491d92f40c4d17586102604efa",
+  "size": 6824,
+  "url": "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py?ref=master",
+  "html_url": "https://github.com/pirate/crypto-trader/blob/master/symbols.py",
+  "git_url": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa",
+  "download_url": "https://raw.githubusercontent.com/pirate/crypto-trader/master/symbols.py",
+  "type": "file",
+  "content": "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py?ref=master",
+    "git": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa",
+    "html": "https://github.com/pirate/crypto-trader/blob/master/symbols.py"
+  }
+}"""
+    /**
+    */
     case class File_Props(
         name: String = "",//"symbols.py",
         path: String = "",//"symbols.py",
@@ -150,12 +153,14 @@ object GitHub_Repo_Content
     ){
         ( 
             field_Result
+                .trim()
                 .stripPrefix("{")
                 .stripPrefix("\"")
                 .stripSuffix("\""),
             buffered_Field_Iter 
         )
     }else{
+        // .head Returns next element of iterator without advancing beyond it.
         val char = buffered_Field_Iter.next()
         
         if( field_End_Delimiter == char ){
@@ -178,7 +183,10 @@ object GitHub_Repo_Content
         buffered_Value_Iter.isEmpty
     ){
         ( 
-            value_Result.stripPrefix("\"").stripSuffix("\""), 
+            value_Result
+                .trim()
+                .stripPrefix("\"")
+                .stripSuffix("\""), 
             buffered_Value_Iter 
         )
     }else{
@@ -241,6 +249,23 @@ object GitHub_Repo_Content
             result = result
         )
     }
+    // InputStream inputstream = new FileInputStream("c:\\data\\input-text.txt");
+    // ByteArrayInputStream(byte[] buf)
+    val ( f_1_N, b_It ) = get_Field_Name( 
+        //scala.io.Source.fromString( 
+        new scala.io.BufferedSource( 
+            //?test_Input 
+            //scala.io.Source.fromString( test_Input )
+            // required: java.io.InputStream
+            new java.io.ByteArrayInputStream(
+                // required: Array[Byte]
+                test_Input.getBytes()
+            )
+        )(scala.io.Codec.UTF8).buffered 
+    )
+    println( "f_1_N:", f_1_N )
+    val ( f_1_V, _ ) = get_Field_Value( b_It )
+    println( "f_1_V:", f_1_V )
     
     /*
     You can create a personal access token 
