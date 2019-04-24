@@ -1,7 +1,48 @@
 1. get each github repo from the source list as zip file  
     1.1. or traverse repo through GitHub API  
     <- implement with Scala  
+    e.g:
+$ head -n2 url_list.csv | tail -n1
+https://github.com/bitly/data_hacks
+$ curl -L https://api.github.com/repos/bitly/data_hacks/zipball > data_hacks__repo.zip
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100 11546    0 11546    0     0   6015      0 --:--:--  0:00:01 --:--:-- 13680
+# or
+$ curl -L https://api.github.com/repos/bitly/data_hacks/tarball > data_hacks__repo.tar.gz
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100  7210    0  7210    0     0   3731      0 --:--:--  0:00:01 --:--:-- 2347k
+
 2. filter `*.py` files  
+$ tar -tvf data_hacks__repo.tar.gz
+drwxrwxr-x root/root         0 2018-03-14 02:08 bitly-data_hacks-c66693b/
+-rw-rw-r-- root/root        11 2018-03-14 02:08 bitly-data_hacks-c66693b/.gitignore
+-rw-rw-r-- root/root      3941 2018-03-14 02:08 bitly-data_hacks-c66693b/README.markdown
+drwxrwxr-x root/root         0 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/
+-rwxrwxr-x root/root      4495 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/bar_chart.py
+-rwxrwxr-x root/root     10716 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/histogram.py
+-rwxrwxr-x root/root      1717 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/ninety_five_percent.py
+-rwxrwxr-x root/root      1656 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/run_for.py
+-rwxrwxr-x root/root      2082 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/sample.py
+-rwxrwxr-x root/root       850 2018-03-14 02:08 bitly-data_hacks-c66693b/setup.py
+gluk-alex@glukalex-desktop:~/Documents/projects/turing.com$ tar -tvf data_hacks__repo.tar.gz | grep .py
+-rwxrwxr-x root/root      4495 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/bar_chart.py
+-rwxrwxr-x root/root     10716 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/histogram.py
+-rwxrwxr-x root/root      1717 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/ninety_five_percent.py
+-rwxrwxr-x root/root      1656 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/run_for.py
+-rwxrwxr-x root/root      2082 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/sample.py
+-rwxrwxr-x root/root       850 2018-03-14 02:08 bitly-data_hacks-c66693b/setup.py
+$ tar -tvf data_hacks__repo.tar.gz --wildcards *.py
+-rwxrwxr-x root/root      4495 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/bar_chart.py
+-rwxrwxr-x root/root     10716 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/histogram.py
+-rwxrwxr-x root/root      1717 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/ninety_five_percent.py
+-rwxrwxr-x root/root      1656 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/run_for.py
+-rwxrwxr-x root/root      2082 2018-03-14 02:08 bitly-data_hacks-c66693b/data_hacks/sample.py
+-rwxrwxr-x root/root       850 2018-03-14 02:08 bitly-data_hacks-c66693b/setup.py
+
 3. deploy instance of Apache Spark ( locally or in AWS )  
    to have some parallelization level | abilites  
    or just run | feed input in batches | ranges | parts  
