@@ -134,7 +134,12 @@ val test_Input = """{
         path: String = "",//"symbols.py",
         size: Int = 0,//6824,
         //>file_Type: String,//"file",
+        // parser stops here ? like never finds the match ?
+        // no it stops after first url 
         `type`: String = "",
+        // fails to compile 
+        //!type_: String = "",
+        //type_Str: String = "",
         content: String = "",
         //encoding: String//"base64",
     )
@@ -148,10 +153,12 @@ val test_Input = """{
     def get_Field_Name(
         buffered_Field_Iter: collection.BufferedIterator[Char],
         field_Result: String = "",
-        field_End_Delimiter: Char = ':'//Set( ',', '}' )
+        field_End_Delimiter: Char = ':',//Set( ',', '}' )
+        is_DeBug_Mode: Boolean = 1 == 1
     ): ( String, collection.BufferedIterator[Char] ) = if(
         buffered_Field_Iter.isEmpty
     ){
+        if(is_DeBug_Mode){println(s"\tfield_Result: ${field_Result}")}
         ( 
             //.stripPrefix("{").trim().stripPrefix("\"").stripSuffix("\"")
             field_Result
@@ -169,6 +176,7 @@ val test_Input = """{
         val char = buffered_Field_Iter.next()
         
         if( field_End_Delimiter == char ){
+            if(is_DeBug_Mode){println(s"\tfield_Result: ${field_Result}")}
             ( 
                 field_Result.dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ), 
                 buffered_Field_Iter 
@@ -194,6 +202,7 @@ val test_Input = """{
     ): ( String, collection.BufferedIterator[Char] ) = if(
         buffered_Value_Iter.isEmpty
     ){
+        if(is_DeBug_Mode){println(s"\tvalue_Result: ${value_Result}")}
         ( 
             value_Result
                 /// works for `string` fails for `boolean` or `number`
@@ -207,7 +216,7 @@ val test_Input = """{
         val char = buffered_Value_Iter.next()
         /// @toDo: refactor conditional to base case ?
         if( value_Result.nonEmpty && value_End_Delimiters.contains( char ) ){
-            if(is_DeBug_Mode){println(s"value_Result: ${value_Result}")}
+            if(is_DeBug_Mode){println(s"\tvalue_Result: ${value_Result}")}
             ( 
 // extracted field name: sha
 // [error] (run-main-a) java.lang.UnsupportedOperationException: empty.tail
@@ -265,7 +274,10 @@ val test_Input = """{
                 case "name" => result.copy( name = value )
                 case "path" => result.copy( path = value )
                 case "size" => result.copy( size = value.toInt )
-                case "type" => result.copy( `type` = value )
+                case "type" => result.copy( 
+                        `type` = value 
+                        //type_Str = value 
+                    )
                 case "content" => result.copy( content = value )
                 case _ => result
         //}else{
@@ -274,7 +286,7 @@ val test_Input = """{
         file_Props_Json_Parser(
             buffered_Source_Iter = buffered_Source_Iter, 
             fields_List = fields_List.tail,
-            result = result,
+            result = next_Result,
             is_DeBug_Mode = is_DeBug_Mode
         )
     }
@@ -295,6 +307,9 @@ val test_Input = """{
     println( s"f_1_N: `${f_1_N}`" )
     val ( f_1_V, _ ) = get_Field_Value( b_It )
     println( s"f_1_V: `${f_1_V}`" )
+    println( "Parsing test_Input:" )
+    println( test_Input )
+    println( "Results:" )
     println( 
         file_Props_Json_Parser(
             new scala.io.BufferedSource( 
