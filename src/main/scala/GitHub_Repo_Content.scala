@@ -148,7 +148,13 @@ object GitHub_Repo_Content
     ): ( String, collection.BufferedIterator[Char] ) = if(
         buffered_Field_Iter.isEmpty
     ){
-        ( field_Result, buffered_Field_Iter )
+        ( 
+            field_Result
+                .stripPrefix("{")
+                .stripPrefix("\"")
+                .stripSuffix("\""),
+            buffered_Field_Iter 
+        )
     }else{
         val char = buffered_Field_Iter.next()
         
@@ -171,7 +177,10 @@ object GitHub_Repo_Content
     ): ( String, collection.BufferedIterator[Char] ) = if(
         buffered_Value_Iter.isEmpty
     ){
-        ( value_Result, buffered_Value_Iter )
+        ( 
+            value_Result.stripPrefix("\"").stripSuffix("\""), 
+            buffered_Value_Iter 
+        )
     }else{
         val char = buffered_Value_Iter.next()
         
@@ -191,12 +200,47 @@ object GitHub_Repo_Content
     until ':' is field name
     then until ','| '}' field's content 
     */
+    @scala.annotation.tailrec
     def file_Props_Json_Parser(
         //url_Source: scala.io.BufferedSource
         buffered_Source_Iter: collection.BufferedIterator[Char], 
-        result: File_Props
-    ): File_Props = result
-    
+        fields_List: List[String] = List(
+            "name",
+            "path",
+            "size",
+            "type",
+            "content" ),
+        result: File_Props = File_Props()
+    ): File_Props = if(
+        fields_List.isEmpty || buffered_Source_Iter.isEmpty
+    ){
+        result
+    }else{
+        val ( name: String, _ ) = get_Field_Name(
+                buffered_Field_Iter = buffered_Source_Iter
+            )
+        val ( value: String, _ ) = get_Field_Value(
+                buffered_Value_Iter = buffered_Source_Iter
+            )
+        val field_Name: String = fields_List.head
+        val next_Result = //if( name == field_Name ){
+            // and without freaking reflections
+            name match {
+                case "name" => result.copy( name = value )
+                case "path" => result.copy( path = value )
+                case "size" => result.copy( size = value.toInt )
+                case "type" => result.copy( `type` = value )
+                case "content" => result.copy( content = value )
+                case _ => result
+        //}else{
+        }
+        
+        file_Props_Json_Parser(
+            buffered_Source_Iter = buffered_Source_Iter, 
+            fields_List = fields_List.tail,
+            result = result
+        )
+    }
     
     /*
     You can create a personal access token 
