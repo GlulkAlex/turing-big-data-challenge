@@ -142,7 +142,8 @@ val test_Input = """{
     // buffered: collection.BufferedIterator[Char]
     //  Creates a buffered iterator from this iterator.
     //val repo_Master_Tree_Root_URL: String = github_API_Response_Source
-    /** assuming field names do not contain ':' */
+    /** assuming field names do not contain ':' 
+    */
     @scala.annotation.tailrec
     def get_Field_Name(
         buffered_Field_Iter: collection.BufferedIterator[Char],
@@ -152,11 +153,15 @@ val test_Input = """{
         buffered_Field_Iter.isEmpty
     ){
         ( 
+            //.stripPrefix("{").trim().stripPrefix("\"").stripSuffix("\"")
             field_Result
-                .stripPrefix("{")
+                /*.stripPrefix("{")
+                .trim()
+                .stripMargin('{')
                 .trim()
                 .stripPrefix("\"")
-                .stripSuffix("\""),
+                .stripSuffix("\"")*/
+                .dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ),
             buffered_Field_Iter 
         )
     }else{
@@ -164,7 +169,10 @@ val test_Input = """{
         val char = buffered_Field_Iter.next()
         
         if( field_End_Delimiter == char ){
-            ( field_Result, buffered_Field_Iter )
+            ( 
+                field_Result.dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ), 
+                buffered_Field_Iter 
+            )
         }else{
             get_Field_Name(
                 buffered_Field_Iter = buffered_Field_Iter,
@@ -173,17 +181,23 @@ val test_Input = """{
         }
     }
     
-    /** assuming field values do not contain ',' and '}' */
+    /** assuming field values do not contain ',' and '}' 
+    /// @toDo: it fails on "size": 6824 because of numerical value 
+    /// that is not enclosed in quotes ?
+    */
     @scala.annotation.tailrec
     def get_Field_Value(
         buffered_Value_Iter: collection.BufferedIterator[Char],
         value_Result: String = "",
-        value_End_Delimiters: Set[Char] = Set( ',', '}' )
+        value_End_Delimiters: Set[Char] = Set( ',', '}' ),
+        is_DeBug_Mode: Boolean = 1 == 1
     ): ( String, collection.BufferedIterator[Char] ) = if(
         buffered_Value_Iter.isEmpty
     ){
         ( 
             value_Result
+                /// works for `string` fails for `boolean` or `number`
+                //?.dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ),
                 .trim()
                 .stripPrefix("\"")
                 .stripSuffix("\""), 
@@ -191,13 +205,24 @@ val test_Input = """{
         )
     }else{
         val char = buffered_Value_Iter.next()
-        
-        if( value_End_Delimiters.contains( char ) ){
-            ( value_Result, buffered_Value_Iter )
+        /// @toDo: refactor conditional to base case ?
+        if( value_Result.nonEmpty && value_End_Delimiters.contains( char ) ){
+            if(is_DeBug_Mode){println(s"value_Result: ${value_Result}")}
+            ( 
+// extracted field name: sha
+// [error] (run-main-a) java.lang.UnsupportedOperationException: empty.tail
+                value_Result
+                    //?.dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ), 
+                    .trim()
+                    .stripPrefix("\"")
+                    .stripSuffix("\""), 
+                buffered_Value_Iter 
+            )
         }else{
             get_Field_Value(
                 buffered_Value_Iter = buffered_Value_Iter,
-                value_Result = value_Result + char
+                value_Result = value_Result + char,
+                is_DeBug_Mode = is_DeBug_Mode
             )
         }
     }
@@ -218,7 +243,8 @@ val test_Input = """{
             "size",
             "type",
             "content" ),
-        result: File_Props = File_Props()
+        result: File_Props = File_Props(),
+        is_DeBug_Mode: Boolean = 1 == 1
     ): File_Props = if(
         fields_List.isEmpty || buffered_Source_Iter.isEmpty
     ){
@@ -231,6 +257,8 @@ val test_Input = """{
                 buffered_Value_Iter = buffered_Source_Iter
             )
         val field_Name: String = fields_List.head
+        if(is_DeBug_Mode){println(s"extracted field name: ${name}")}
+        if(is_DeBug_Mode && 1 == 1){println(value)}
         val next_Result = //if( name == field_Name ){
             // and without freaking reflections
             name match {
@@ -246,7 +274,8 @@ val test_Input = """{
         file_Props_Json_Parser(
             buffered_Source_Iter = buffered_Source_Iter, 
             fields_List = fields_List.tail,
-            result = result
+            result = result,
+            is_DeBug_Mode = is_DeBug_Mode
         )
     }
     // InputStream inputstream = new FileInputStream("c:\\data\\input-text.txt");
@@ -263,9 +292,9 @@ val test_Input = """{
             )
         )(scala.io.Codec.UTF8).buffered 
     )
-    println( s"f_1_N: ${f_1_N}" )
+    println( s"f_1_N: `${f_1_N}`" )
     val ( f_1_V, _ ) = get_Field_Value( b_It )
-    println( s"f_1_V: ${f_1_V}" )
+    println( s"f_1_V: `${f_1_V}`" )
     println( 
         file_Props_Json_Parser(
             new scala.io.BufferedSource( 
