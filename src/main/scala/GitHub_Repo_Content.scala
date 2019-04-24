@@ -9,7 +9,7 @@ import scalaj.http.HttpResponse
 //import fr.hmil.roshttp.response.SimpleHttpResponse
 
 import cats.data.NonEmptyList 
-import github4s.free.domain.{ Repository, Content }
+import github4s.free.domain.{ Repository, Content, RepoUrls }
 
 
 /**
@@ -24,6 +24,36 @@ $ curl -#L https://api.github.com/repos/BugScanTeam/DNSLog/tarball | tar tvfz - 
 # path to file on master branch ( not for download but to view content )
 |repo url from csv                    |github route|part from tarball
  https://github.com/BugScanTeam/DNSLog/tree/master/dnslog/dnslog/__init__.py
+
+or using path | files exteactor with github api:
+# for 'https://github.com/pirate/crypto-trader'
+|github api route            |owner |repo name    |branche route  |
+ https://api.github.com/repos/pirate/crypto-trader/branches/master
+then get tree root url:
+...
+      "tree": {
+        ...,
+        "url": "https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724"
+      },
+...
+then got info for recursive tree traversal:
+...
+    {
+      "path": "stubs",
+      "mode": "040000",
+      "type": "tree", <- next recursion level 
+      "sha": "622cb951fb9ddd1d634371c47add145b5471f68c",
+      "url": "https://api.github.com/repos/pirate/crypto-trader/git/trees/622cb951fb9ddd1d634371c47add145b5471f68c"
+    },
+    {
+      "path": "symbols.py", <- file name
+      "mode": "100644",
+      "type": "blob", <- file
+      "sha": "248ffb14ea2899491d92f40c4d17586102604efa",
+      "size": 6824,
+      "url": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa"
+    }
+...
 */
 object GitHub_Repo_Content 
     extends App {
@@ -60,22 +90,27 @@ object GitHub_Repo_Content
         )
 /*
 Repository(
-    946824,data_hacks,bitly/data_hacks,
-    User(251133,bitly,
+    946824, // 0
+    data_hacks, // 1
+    bitly/data_hacks, // 2
+    User( // 3
+        251133,bitly,
         https://avatars1.githubusercontent.com/u/251133?v=4,
         https://github.com/bitly,None,None,None,None,None,None,
         Some(https://api.github.com/users/bitly/followers),
         Some(https://api.github.com/users/bitly/following{/other_user}),
         Organization,None,None
-    ),false,
-    Some(Command line utilities for data analysis),false,
-    RepoUrls(
-        https://api.github.com/repos/bitly/data_hacks,
-        https://github.com/bitly/data_hacks,
-        git://github.com/bitly/data_hacks.git,git@github.com:bitly/data_hacks.git,
-        https://github.com/bitly/data_hacks.git,
-        https://github.com/bitly/data_hacks,
-        Map(
+    ),
+    false, // 4
+    Some(Command line utilities for data analysis),
+    false, // 5
+    RepoUrls( // 6
+        https://api.github.com/repos/bitly/data_hacks, // 7 6.0
+        https://github.com/bitly/data_hacks, // 8 6.1
+        git://github.com/bitly/data_hacks.git,git@github.com:bitly/data_hacks.git, // 9
+        https://github.com/bitly/data_hacks.git, // 10 6.2
+        https://github.com/bitly/data_hacks, // 11 6.3
+        Map( // 6.4
             tags_url -> https://api.github.com/repos/bitly/data_hacks/tags, 
             statuses_url -> https://api.github.com/repos/bitly/data_hacks/statuses/{sha}, 
             blobs_url -> https://api.github.com/repos/bitly/data_hacks/git/blobs{/sha}, 
@@ -85,6 +120,52 @@ Repository(
             releases_url -> https://api.github.com/repos/bitly/data_hacks/releases{/id}, 
             ///>>>
             trees_url -> https://api.github.com/repos/bitly/data_hacks/git/trees{/sha}, 
+            ///>>>
+            // it gives JSON with
+//             "tree": {
+//                 "sha": "994b441daecddd98c3b313a288c1ae0611e56439",
+//                 "url": "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439"
+//             },
+// that gives in turn:
+// {
+//   "sha": "994b441daecddd98c3b313a288c1ae0611e56439",
+//   "url": "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439",
+//   "tree": [
+//     {
+//       "path": ".gitignore",
+//       "mode": "100644",
+//       "type": "blob",
+//       "sha": "9d0b71a3c79d2d3afbfa99269fea4280f5e73344",
+//       "size": 11,
+//       "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/9d0b71a3c79d2d3afbfa99269fea4280f5e73344"
+//     },
+//     {
+//       "path": "README.markdown",
+//       "mode": "100644",
+//       "type": "blob",
+//       "sha": "053dae1ad11e6b864a97031430abd4d470c0ea34",
+//       "size": 3941,
+//       "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/053dae1ad11e6b864a97031430abd4d470c0ea34"
+//     },
+//     {
+//       "path": "data_hacks",
+//       "mode": "040000",
+///> recursion 
+//       "type": "tree",
+//       "sha": "4cf5df18ec0052abf4d561c992f138ac144f8304",
+//       "url": "https://api.github.com/repos/bitly/data_hacks/git/trees/4cf5df18ec0052abf4d561c992f138ac144f8304"
+//     },
+//     {
+//       "path": "setup.py",
+//       "mode": "100755",
+//       "type": "blob",
+//       "sha": "36fa158820c95e26d816f8f1bbfd962e1a482df9",
+//       "size": 850,
+//       "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/36fa158820c95e26d816f8f1bbfd962e1a482df9"
+//     }
+//   ],
+//   "truncated": false
+// }
             branches_url -> https://api.github.com/repos/bitly/data_hacks/branches{/branch}, 
             collaborators_url -> https://api.github.com/repos/bitly/data_hacks/collaborators{/collaborator}, 
             subscription_url -> https://api.github.com/repos/bitly/data_hacks/subscription, 
@@ -92,13 +173,80 @@ Repository(
             commits_url -> https://api.github.com/repos/bitly/data_hacks/commits{/sha}, 
             contents_url -> https://api.github.com/repos/bitly/data_hacks/contents/{+path}, 
             git_tags_url -> https://api.github.com/repos/bitly/data_hacks/git/tags{/sha}, 
-            downloads_url -> https://api.github.com/repos/bitly/data_hacks/downloads, milestones_url -> https://api.github.com/repos/bitly/data_hacks/milestones{/number}, compare_url -> https://api.github.com/repos/bitly/data_hacks/compare/{base}...{head}, notifications_url -> https://api.github.com/repos/bitly/data_hacks/notifications{?since,all,participating}, comments_url -> https://api.github.com/repos/bitly/data_hacks/comments{/number}, pulls_url -> https://api.github.com/repos/bitly/data_hacks/pulls{/number}, teams_url -> https://api.github.com/repos/bitly/data_hacks/teams, merges_url -> https://api.github.com/repos/bitly/data_hacks/merges, keys_url -> https://api.github.com/repos/bitly/data_hacks/keys{/key_id}, deployments_url -> https://api.github.com/repos/bitly/data_hacks/deployments, contributors_url -> https://api.github.com/repos/bitly/data_hacks/contributors, forks_url -> https://api.github.com/repos/bitly/data_hacks/forks, hooks_url -> https://api.github.com/repos/bitly/data_hacks/hooks, archive_url -> https://api.github.com/repos/bitly/data_hacks/{archive_format}{/ref}, issues_url -> https://api.github.com/repos/bitly/data_hacks/issues{/number}, assignees_url -> https://api.github.com/repos/bitly/data_hacks/assignees{/user}, events_url -> https://api.github.com/repos/bitly/data_hacks/events, issue_comment_url -> https://api.github.com/repos/bitly/data_hacks/issues/comments{/number}, labels_url -> https://api.github.com/repos/bitly/data_hacks/labels{/name}, git_commits_url -> https://api.github.com/repos/bitly/data_hacks/git/commits{/sha}, stargazers_url -> https://api.github.com/repos/bitly/data_hacks/stargazers)),2010-09-28T22:09:22Z,2019-04-18T14:04:24Z,2018-03-13T21:08:37Z,Some(http://github.com/bitly/data_hacks),Some(Python),RepoStatus(50,1840,1840,182,18,Some(18),Some(1840),Some(182),Some(128),true,true,true,false),Some(User(251133,bitly,https://avatars1.githubusercontent.com/u/251133?v=4,https://github.com/bitly,None,None,None,None,None,None,Some(https://api.github.com/users/bitly/followers),Some(https://api.github.com/users/bitly/following{/other_user}),Organization,None,None)))
+            downloads_url -> https://api.github.com/repos/bitly/data_hacks/downloads, 
+            milestones_url -> https://api.github.com/repos/bitly/data_hacks/milestones{/number}, 
+            compare_url -> https://api.github.com/repos/bitly/data_hacks/compare/{base}...{head}, 
+            notifications_url -> https://api.github.com/repos/bitly/data_hacks/notifications{?since,all,participating}, 
+            comments_url -> https://api.github.com/repos/bitly/data_hacks/comments{/number}, 
+            pulls_url -> https://api.github.com/repos/bitly/data_hacks/pulls{/number}, 
+            teams_url -> https://api.github.com/repos/bitly/data_hacks/teams, 
+            merges_url -> https://api.github.com/repos/bitly/data_hacks/merges, 
+            keys_url -> https://api.github.com/repos/bitly/data_hacks/keys{/key_id}, 
+            deployments_url -> https://api.github.com/repos/bitly/data_hacks/deployments, 
+            contributors_url -> https://api.github.com/repos/bitly/data_hacks/contributors, 
+            forks_url -> https://api.github.com/repos/bitly/data_hacks/forks, 
+            hooks_url -> https://api.github.com/repos/bitly/data_hacks/hooks, 
+            archive_url -> https://api.github.com/repos/bitly/data_hacks/{archive_format}{/ref}, 
+            issues_url -> https://api.github.com/repos/bitly/data_hacks/issues{/number}, 
+            assignees_url -> https://api.github.com/repos/bitly/data_hacks/assignees{/user}, 
+            events_url -> https://api.github.com/repos/bitly/data_hacks/events, 
+            issue_comment_url -> https://api.github.com/repos/bitly/data_hacks/issues/
+            comments{/number}, labels_url -> https://api.github.com/repos/bitly/data_hacks/
+            labels{/name}, git_commits_url -> https://api.github.com/repos/bitly/data_hacks/git/commits{/sha}, 
+            stargazers_url -> https://api.github.com/repos/bitly/data_hacks/stargazers
+        )
+    ),
+    2010-09-28T22:09:22Z,
+    2019-04-18T14:04:24Z,
+    2018-03-13T21:08:37Z,
+    Some(
+        http://github.com/bitly/data_hacks
+    ),
+    Some(Python),
+    RepoStatus(
+        50,1840,1840,182,18,Some(18),Some(1840),
+        Some(182),Some(128),true,true,true,false
+    ),
+    Some(
+        User(
+            251133,bitly,
+            https://avatars1.githubusercontent.com/u/251133?v=4,
+            https://github.com/bitly,None,None,None,None,None,None,
+            Some(
+                https://api.github.com/users/bitly/followers
+            ),
+            Some(
+                https://api.github.com/users/bitly/following{/other_user}
+            ),
+            Organization,None,None
+        )
+    )
+)
 */
     getRepo.exec[cats.Id, HttpResponse[String]]() match {
         case Left(e) => println(s"Something went wrong: ${e.getMessage}")
-        case Right(r) => {
-            println("""Github.repos.get( owner: "bitly", repository: "data_hacks" )""")
-            println(r.result)
+        case Right(r) => r.result match {
+            case repository: Repository => {
+                println("""Github.repos.get( owner: "bitly", repository: "data_hacks" )""")
+                //>println(r.result)
+                    val RepoUrls(
+                        url: String,
+                        html_url: String,
+                        git_url: String,
+                        ssh_url: String,
+                        clone_url: String,
+                        svn_url: String,
+                        otherUrls: Map[String, String]
+                    ) = repository.urls
+                    println(
+                        s"""branches_url:
+                        |${
+                            otherUrls.getOrElse( 
+                                "branches_url", "key not found" )
+                        }""".stripMargin
+                    )
+                }
+            case _ => println(s"""Unexpeced Github.repos.get():\n${r.result}""") 
         }
     }
 
@@ -222,8 +370,18 @@ decode(src.getBytes(StandardCharsets.ISO_8859_1))
                                 )
                         )
                         println(s"${name} decoded_Content:\n${decoded_Content}")
+                        println( "*" * 80 )
+                        println( "Normalized: without empty strings and trailing spaces" )
+                        println( 
+                            decoded_Content
+                                .lines
+                                //?.map( _.trim() )
+                                .map( _.stripSuffix(" ") )
+                                .filter( _ != "" )
+                                .mkString("\n") 
+                            )
                     }
-                case _ => println(r.result) 
+                case _ => println(s"""Unexpeced Github.repos.getContents():\n${r.result}""") 
             }
         }
     }
