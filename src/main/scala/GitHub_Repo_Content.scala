@@ -153,8 +153,8 @@ val test_Input = """{
     ){
         ( 
             field_Result
-                .trim()
                 .stripPrefix("{")
+                .trim()
                 .stripPrefix("\"")
                 .stripSuffix("\""),
             buffered_Field_Iter 
@@ -164,7 +164,7 @@ val test_Input = """{
         val char = buffered_Field_Iter.next()
         
         if( field_End_Delimiter == char ){
-            ( field_Result + char, buffered_Field_Iter )
+            ( field_Result, buffered_Field_Iter )
         }else{
             get_Field_Name(
                 buffered_Field_Iter = buffered_Field_Iter,
@@ -193,7 +193,7 @@ val test_Input = """{
         val char = buffered_Value_Iter.next()
         
         if( value_End_Delimiters.contains( char ) ){
-            ( value_Result + char, buffered_Value_Iter )
+            ( value_Result, buffered_Value_Iter )
         }else{
             get_Field_Value(
                 buffered_Value_Iter = buffered_Value_Iter,
@@ -263,9 +263,14 @@ val test_Input = """{
             )
         )(scala.io.Codec.UTF8).buffered 
     )
-    println( "f_1_N:", f_1_N )
+    println( s"f_1_N: ${f_1_N}" )
     val ( f_1_V, _ ) = get_Field_Value( b_It )
-    println( "f_1_V:", f_1_V )
+    println( s"f_1_V: ${f_1_V}" )
+    println( 
+        file_Props_Json_Parser(
+            new scala.io.BufferedSource( 
+            new java.io.ByteArrayInputStream( test_Input.getBytes() )
+        )(scala.io.Codec.UTF8).buffered ) )
     
     /*
     You can create a personal access token 
