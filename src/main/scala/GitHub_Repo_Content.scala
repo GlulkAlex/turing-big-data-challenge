@@ -102,8 +102,13 @@ constructor cannot be instantiated to expected type;
 [error]  required: cats.data.NonEmptyList[github4s.free.domain.Content]
                 */
                 // final case class NonEmptyList[+A](head: A, tail: List[A]) extends Product with Serializable
-                case NonEmptyList( Content(
-                    `type`: String,
+                case NonEmptyList( content_Container @ Content(
+                    // to turn the ( lower cased ) pattern into a stable identifier pattern
+                    // work around, here for reserved word with `backticks`
+                    // with scalaVersion := "2.11.9" -> get:
+                    //? Pattern variables must start with a lower-case letter. (SLS 8.1.1.)
+                    //`type`: String,
+                    type_Str: String,
                     encoding: Option[String],
                     target: Option[String],
                     submodule_git_url: Option[String],

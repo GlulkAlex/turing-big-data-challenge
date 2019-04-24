@@ -40,11 +40,16 @@ $ sbt
 ```
 
 ### How to run:
-In order to 
+In order to  
 start the ?  
+
+<??? not needed to run the job  
+to start `Spark` through the `Scala` shell:  
+at folder where `spark-2.4.1-bin-hadoop2.7` was unpacked:  
 ```sh
 $ ./bin/spark-shell --master local[2]
 ```
+( more at `README.md` file in the same directory )
 ```sh
 $ ./sbin/start-master.sh
 starting org.apache.spark.deploy.master.Master
@@ -54,16 +59,31 @@ and after task id done:
 $ ./sbin/stop-master.sh
 stopping org.apache.spark.deploy.master.Master
 ```
+???/>
+
 one option is 
-to make a `build` in the corresponding folder  
+to make a `?`   
 ```sh
 $ 
 ```
-or run ? with ? server:  
+[how to start up a Spark cluster  
+on Amazon Web Services (AWS)  
+using the Flintrock command-line tool](https://heather.miller.am/blog/launching-a-spark-cluster-part-1.html#setting-up-flintrock-and-amazon-web-services)
+### general workflow steps:
+1. Develop locally.
+2. When ready to deploy, compile, package up `jars` to send to cluster.
+3. Copy `jars` to `master` and `worker` nodes using `Flintrock`.
+4. Use `spark-submit` script to start job.
+5. Check `Spark web UI` to see output (stdout/stderr).  
+
+to run job on local Spark cluster:  
 ```sh
 $ sbt
 sbt:simple-spark-deploy> run
 ```
+`Spark` comes with a `spark-submit` script  
+which can be used to submit job to the cluster.  
+
 or use the *?* files  
 from `?.tar.gz` archive .
 
