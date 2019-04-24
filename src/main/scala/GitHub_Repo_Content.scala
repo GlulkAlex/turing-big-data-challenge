@@ -58,6 +58,7 @@ then got info for recursive tree traversal:
 GET /repos/:owner/:repo/contents/:path
 "url": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md",
 https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py
+# prettified ( actual respons is without spaces and lines ):
 {
   "name": "symbols.py",
   "path": "symbols.py",
@@ -126,19 +127,75 @@ object GitHub_Repo_Content
     
     val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
     case class File_Props(
-        name: String,//"symbols.py",
-        path: String,//"symbols.py",
-        size: Int,//6824,
-        type: String,//"file",
-        content: String,
+        name: String = "",//"symbols.py",
+        path: String = "",//"symbols.py",
+        size: Int = 0,//6824,
+        //>file_Type: String,//"file",
+        `type`: String = "",
+        content: String = "",
         //encoding: String//"base64",
     )
     // scala.io.BufferedSource
     // buffered: collection.BufferedIterator[Char]
     //  Creates a buffered iterator from this iterator.
     //val repo_Master_Tree_Root_URL: String = github_API_Response_Source
+    /** assuming field names do not contain ':' */
+    @scala.annotation.tailrec
+    def get_Field_Name(
+        buffered_Field_Iter: collection.BufferedIterator[Char],
+        field_Result: String = "",
+        field_End_Delimiter: Char = ':'//Set( ',', '}' )
+    ): ( String, collection.BufferedIterator[Char] ) = if(
+        buffered_Field_Iter.isEmpty
+    ){
+        ( field_Result, buffered_Field_Iter )
+    }else{
+        val char = buffered_Field_Iter.next()
+        
+        if( field_End_Delimiter == char ){
+            ( field_Result + char, buffered_Field_Iter )
+        }else{
+            get_Field_Name(
+                buffered_Field_Iter = buffered_Field_Iter,
+                field_Result = field_Result + char
+            )
+        }
+    }
+    
+    /** assuming field values do not contain ',' and '}' */
+    @scala.annotation.tailrec
+    def get_Field_Value(
+        buffered_Value_Iter: collection.BufferedIterator[Char],
+        value_Result: String = "",
+        value_End_Delimiters: Set[Char] = Set( ',', '}' )
+    ): ( String, collection.BufferedIterator[Char] ) = if(
+        buffered_Value_Iter.isEmpty
+    ){
+        ( value_Result, buffered_Value_Iter )
+    }else{
+        val char = buffered_Value_Iter.next()
+        
+        if( value_End_Delimiters.contains( char ) ){
+            ( value_Result + char, buffered_Value_Iter )
+        }else{
+            get_Field_Value(
+                buffered_Value_Iter = buffered_Value_Iter,
+                value_Result = value_Result + char
+            )
+        }
+    }
+    /**
+          |             |
+    "name": "symbols.py",
+    after '{' | ','
+    until ':' is field name
+    then until ','| '}' field's content 
+    */
     def file_Props_Json_Parser(
-    ): File_Props = ???
+        //url_Source: scala.io.BufferedSource
+        buffered_Source_Iter: collection.BufferedIterator[Char], 
+        result: File_Props
+    ): File_Props = result
     
     
     /*
