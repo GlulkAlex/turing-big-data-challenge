@@ -61,6 +61,24 @@ object GitHub_Repo_Content
     import java.util.Base64.Decoder
     
     
+    // scala.io.Codec -> final val UTF8: Codec
+    // scala.io.Source.
+    //  fromURL(url: URL, enc: String): BufferedSource
+    //  creates Source from file with given file: URI
+    // fromURL(s: String)(implicit codec: Codec): BufferedSource
+    //    same as fromURL(new URL(s))
+    // fromURL(s: String, enc: String): BufferedSource
+    //  same as fromURL(new URL(s))(Codec(enc))
+    // scala.io.BufferedSource.
+    //  getLines(): collection.Iterator[String]
+    //  Returns an iterator who returns lines (NOT including newline character(s)).
+    val url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
+    // get JSON from github API
+    val github_API_Response_Source = scala.io.Source
+        //? required: java.net.URL
+        .fromURL(s = url, enc = "UTF8" )
+    
+    println( github_API_Response_Source.mkString )
     /*
     You can create a personal access token 
     and use it 
@@ -268,6 +286,7 @@ Repository(
         .repos
         .getContents(
             //>"47deg", "github4s", "README.md", Some("heads/master")
+            // owner,  repository name, path + file name, branch 
             "BugScanTeam", "DNSLog", "dnslog/zoneresolver.py", Some("heads/master")
         )
     /*

@@ -46,6 +46,7 @@ scalaVersion := "2.12.8"
 // both versions start failin with
 // java.lang.ExceptionInInitializerError
 // Caused by: com.fasterxml.jackson.databind.JsonMappingException: Incompatible Jackson version: 2.8.11-3
+/// <- @fixEd:
 name := "simple-spark-deploy"
 version := "0.1"
 
@@ -79,3 +80,5 @@ libraryDependencies += "org.apache.spark" %% "spark-streaming-kinesis-asl" % "2.
 libraryDependencies += "org.apache.spark" %% "spark-streaming" % "2.3.0
 */
 libraryDependencies += "com.47deg" %% "github4s" % "0.20.1"
+
+//libraryDependencies += "com.47deg" %% "fetch" % "1.0.0"
