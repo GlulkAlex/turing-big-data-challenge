@@ -12,6 +12,19 @@ import cats.data.NonEmptyList
 import github4s.free.domain.{ Repository, Content }
 
 
+/**
+# get all *.py files in repo with relative path names included 
+# e.g. for 'https://github.com/BugScanTeam/DNSLog':
+$ curl -#L https://api.github.com/repos/BugScanTeam/DNSLog/tarball | tar tvfz - -C /tmp --wildcards *.py
+######################################################################## 100,0%
+-rw-rw-r-- root/root         0 2018-11-14 14:07 BugScanTeam-DNSLog-235067b/dnslog/dnslog/__init__.py
+...
+-rw-rw-r-- root/root      4356 2018-11-14 14:07 BugScanTeam-DNSLog-235067b/dnslog/zoneresolver.py
+
+# path to file on master branch ( not for download but to view content )
+|repo url from csv                    |github route|part from tarball
+ https://github.com/BugScanTeam/DNSLog/tree/master/dnslog/dnslog/__init__.py
+*/
 object GitHub_Repo_Content 
     extends App {
     import java.util.Base64
@@ -37,6 +50,58 @@ object GitHub_Repo_Content
     val accessToken = sys.env.get("GITHUB4S_ACCESS_TOKEN")
     //accessToken:'Some(1...c)'
     //println(s"accessToken:'${accessToken}'")
+    
+    val getRepo = Github(accessToken)
+        .repos.get(
+        // the repository coordinates (owner and name of the repository).
+            //>"47deg", "github4s"
+            //https://github.com/bitly/data_hacks
+            "bitly", "data_hacks"
+        )
+/*
+Repository(
+    946824,data_hacks,bitly/data_hacks,
+    User(251133,bitly,
+        https://avatars1.githubusercontent.com/u/251133?v=4,
+        https://github.com/bitly,None,None,None,None,None,None,
+        Some(https://api.github.com/users/bitly/followers),
+        Some(https://api.github.com/users/bitly/following{/other_user}),
+        Organization,None,None
+    ),false,
+    Some(Command line utilities for data analysis),false,
+    RepoUrls(
+        https://api.github.com/repos/bitly/data_hacks,
+        https://github.com/bitly/data_hacks,
+        git://github.com/bitly/data_hacks.git,git@github.com:bitly/data_hacks.git,
+        https://github.com/bitly/data_hacks.git,
+        https://github.com/bitly/data_hacks,
+        Map(
+            tags_url -> https://api.github.com/repos/bitly/data_hacks/tags, 
+            statuses_url -> https://api.github.com/repos/bitly/data_hacks/statuses/{sha}, 
+            blobs_url -> https://api.github.com/repos/bitly/data_hacks/git/blobs{/sha}, 
+            git_refs_url -> https://api.github.com/repos/bitly/data_hacks/git/refs{/sha}, 
+            issue_events_url -> https://api.github.com/repos/bitly/data_hacks/issues/events{/number}, 
+            subscribers_url -> https://api.github.com/repos/bitly/data_hacks/subscribers, 
+            releases_url -> https://api.github.com/repos/bitly/data_hacks/releases{/id}, 
+            ///>>>
+            trees_url -> https://api.github.com/repos/bitly/data_hacks/git/trees{/sha}, 
+            branches_url -> https://api.github.com/repos/bitly/data_hacks/branches{/branch}, 
+            collaborators_url -> https://api.github.com/repos/bitly/data_hacks/collaborators{/collaborator}, 
+            subscription_url -> https://api.github.com/repos/bitly/data_hacks/subscription, 
+            languages_url -> https://api.github.com/repos/bitly/data_hacks/languages, 
+            commits_url -> https://api.github.com/repos/bitly/data_hacks/commits{/sha}, 
+            contents_url -> https://api.github.com/repos/bitly/data_hacks/contents/{+path}, 
+            git_tags_url -> https://api.github.com/repos/bitly/data_hacks/git/tags{/sha}, 
+            downloads_url -> https://api.github.com/repos/bitly/data_hacks/downloads, milestones_url -> https://api.github.com/repos/bitly/data_hacks/milestones{/number}, compare_url -> https://api.github.com/repos/bitly/data_hacks/compare/{base}...{head}, notifications_url -> https://api.github.com/repos/bitly/data_hacks/notifications{?since,all,participating}, comments_url -> https://api.github.com/repos/bitly/data_hacks/comments{/number}, pulls_url -> https://api.github.com/repos/bitly/data_hacks/pulls{/number}, teams_url -> https://api.github.com/repos/bitly/data_hacks/teams, merges_url -> https://api.github.com/repos/bitly/data_hacks/merges, keys_url -> https://api.github.com/repos/bitly/data_hacks/keys{/key_id}, deployments_url -> https://api.github.com/repos/bitly/data_hacks/deployments, contributors_url -> https://api.github.com/repos/bitly/data_hacks/contributors, forks_url -> https://api.github.com/repos/bitly/data_hacks/forks, hooks_url -> https://api.github.com/repos/bitly/data_hacks/hooks, archive_url -> https://api.github.com/repos/bitly/data_hacks/{archive_format}{/ref}, issues_url -> https://api.github.com/repos/bitly/data_hacks/issues{/number}, assignees_url -> https://api.github.com/repos/bitly/data_hacks/assignees{/user}, events_url -> https://api.github.com/repos/bitly/data_hacks/events, issue_comment_url -> https://api.github.com/repos/bitly/data_hacks/issues/comments{/number}, labels_url -> https://api.github.com/repos/bitly/data_hacks/labels{/name}, git_commits_url -> https://api.github.com/repos/bitly/data_hacks/git/commits{/sha}, stargazers_url -> https://api.github.com/repos/bitly/data_hacks/stargazers)),2010-09-28T22:09:22Z,2019-04-18T14:04:24Z,2018-03-13T21:08:37Z,Some(http://github.com/bitly/data_hacks),Some(Python),RepoStatus(50,1840,1840,182,18,Some(18),Some(1840),Some(182),Some(128),true,true,true,false),Some(User(251133,bitly,https://avatars1.githubusercontent.com/u/251133?v=4,https://github.com/bitly,None,None,None,None,None,None,Some(https://api.github.com/users/bitly/followers),Some(https://api.github.com/users/bitly/following{/other_user}),Organization,None,None)))
+*/
+    getRepo.exec[cats.Id, HttpResponse[String]]() match {
+        case Left(e) => println(s"Something went wrong: ${e.getMessage}")
+        case Right(r) => {
+            println("""Github.repos.get( owner: "bitly", repository: "data_hacks" )""")
+            println(r.result)
+        }
+    }
+
     /*
     Get contents
     This method returns 
@@ -54,7 +119,8 @@ object GitHub_Repo_Content
     val getContents = Github(accessToken)
         .repos
         .getContents(
-            "47deg", "github4s", "README.md", Some("heads/master")
+            //>"47deg", "github4s", "README.md", Some("heads/master")
+            "BugScanTeam", "DNSLog", "dnslog/zoneresolver.py", Some("heads/master")
         )
     /*
     case class Content(

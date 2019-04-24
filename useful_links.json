@@ -37,8 +37,13 @@
 
 "https://askubuntu.com/questions/653505/uncompress-file-from-url-to-hard-disk", 
 "https://help.ubuntu.com/community/EnvironmentVariables", 
+
 "https://unix.stackexchange.com/questions/61461/how-to-extract-specific-files-from-tar-gz", 
-"https://www.gnu.org/software/tar/manual/tar.html#SEC113",  
+"https://www.gnu.org/software/tar/manual/tar.html#SEC113",
+"https://www.thegeekstuff.com/2010/04/unix-tar-command-examples/",
+"https://www.tecmint.com/18-tar-command-examples-in-linux/",
+"https://www.thegeekstuff.com/2012/04/curl-examples/#Follow%20HTTP%20Location%20Headers%20with%20-L%20option",
+"https://linuxize.com/post/curl-command-examples/",
 
 "https://docs.databricks.com/user-guide/importing-data.html#load-data", 
 "https://docs.databricks.com/spark/latest/data-sources/read-json.html#read-json-files", 
