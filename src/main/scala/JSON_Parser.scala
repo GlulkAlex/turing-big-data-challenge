@@ -86,7 +86,9 @@ object JSON_Parser {
     def get_Field_Name(
         buffered_Field_Iter: collection.BufferedIterator[Char],
         field_Result: String = "",
-        field_End_Delimiter: Char = ':',//Set( ',', '}' )
+        //?field_End_Delimiter: Char = ':',//Set( ',', '}' )
+        field_Quote: Char = '"',
+        formatters: Set[Char] = Set( '{', ' ' ),
         is_DeBug_Mode: Boolean = 1 == 1
     ): ( String, collection.BufferedIterator[Char] ) = if(
         buffered_Field_Iter.isEmpty
@@ -94,30 +96,39 @@ object JSON_Parser {
         if(is_DeBug_Mode){println(s"\tfield_Result: ${field_Result}")}
         ( 
             //.stripPrefix("{").trim().stripPrefix("\"").stripSuffix("\"")
-            field_Result
+            field_Result,
                 /*.stripPrefix("{")
                 .trim()
                 .stripMargin('{')
                 .trim()
                 .stripPrefix("\"")
                 .stripSuffix("\"")*/
-                .dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ),
+                //.dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ),
             buffered_Field_Iter 
         )
     }else{
         // .head Returns next element of iterator without advancing beyond it.
         val char = buffered_Field_Iter.next()
         
-        if( field_End_Delimiter == char ){
+        if( 
+            //?field_End_Delimiter == char 
+            char == field_Quote && field_Result.nonEmpty//length > 0
+        ){
             if(is_DeBug_Mode){println(s"\tfield_Result: ${field_Result}")}
             ( 
-                field_Result.dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ), 
+                field_Result,//?.dropWhile( _ != '"' ).tail.takeWhile( _ != '"' ), 
                 buffered_Field_Iter 
             )
         }else{
+            val next_Field_Result = if( formatters.contains( char ) ){
+                field_Result 
+            }else{
+                field_Result + char
+            }
+            
             get_Field_Name(
                 buffered_Field_Iter = buffered_Field_Iter,
-                field_Result = field_Result + char
+                field_Result = next_Field_Result
             )
         }
     }
@@ -179,16 +190,24 @@ object JSON_Parser {
     def file_Props_Json_Parser(
         //url_Source: scala.io.BufferedSource
         buffered_Source_Iter: collection.BufferedIterator[Char], 
-        fields_List: List[String] = List(
+        /*fields_List: List[String] = List(
             "name",
             "path",
             "size",
             "type",
-            "content" ),
+            "content" 
+        ),*/
+        extracted_Fields_Count: Int = 0,
+        //fields_Total: Int = 5,
         result: File_Props = File_Props(),
         is_DeBug_Mode: Boolean = 1 == 1
     ): File_Props = if(
-        fields_List.isEmpty || buffered_Source_Iter.isEmpty
+        // it stops right after the last fields_List item is poped
+        // assuming nonEmpty field value ? 
+        // ( not true in general as empty string is perfectly valid )
+        //?fields_List.isEmpty
+        extracted_Fields_Count == 5 
+        || buffered_Source_Iter.isEmpty
     ){
         result
     }else{
@@ -198,11 +217,12 @@ object JSON_Parser {
         val ( value: String, _ ) = get_Field_Value(
                 buffered_Value_Iter = buffered_Source_Iter
             )
-        val field_Name: String = fields_List.head
+        //>val field_Name: String = fields_List.head
         if(is_DeBug_Mode){println(s"extracted field name: ${name}")}
         if(is_DeBug_Mode && 1 == 1){println(value)}
         val next_Result = //if( name == field_Name ){
-            // and without freaking reflections
+            // and without pesky reflections ?
+            // but very hardcoded
             name match {
                 case "name" => result.copy( name = value )
                 case "path" => result.copy( path = value )
@@ -218,7 +238,8 @@ object JSON_Parser {
         
         file_Props_Json_Parser(
             buffered_Source_Iter = buffered_Source_Iter, 
-            fields_List = fields_List.tail,
+            //fields_List = fields_List.tail,
+            extracted_Fields_Count = extracted_Fields_Count + 1,
             result = next_Result,
             is_DeBug_Mode = is_DeBug_Mode
         )
