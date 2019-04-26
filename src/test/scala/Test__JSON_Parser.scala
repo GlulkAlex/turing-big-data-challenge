@@ -13,7 +13,8 @@ import GitHub_Repo_Content.{
     decode_Base64_Content, 
     drop_Empty_Lines_And_Trailing_Spaces_From_Content, 
     get_Repo_Owner_And_Name_From_URL,
-    get_Repo_Master_Tree_Root_URL
+    get_Repo_Master_Tree_Root_URL,
+    get_Current_Tree_Children_Props_Iterator
 }
 
     
@@ -260,6 +261,23 @@ class Test_JSON_Parser extends LambdaTest {
                 "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439",
                 "Expected to be equal" 
             )
+        } + 
+        test("get_Current_Tree_Children_Props_Iterator Test") {
+            /*val trees_BufferedSource: scala.io.BufferedSource = scala.io.Source
+                .fromFile(
+                    name = "./src/test/resources/repo_git_trees_url_response.json", 
+                    enc = "UTF8" 
+                )*/
+            val trees_Items_Iter = get_Current_Tree_Children_Props_Iterator( 
+                tree_URL = "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439"
+            )
+            
+            assertEq( 
+                trees_Items_Iter.next(), 
+                //( "path", "type", "sha" ),
+                ( ".gitignore", "blob", "9d0b71a3c79d2d3afbfa99269fea4280f5e73344" ),
+                "Expected to be equal" 
+            ) 
         }
     } 
 }

@@ -148,47 +148,120 @@ object GitHub_Repo_Content
         val github_API_Response_Buffered_Source: scala.io.BufferedSource = 
         scala.io.Source
             .fromURL(s = tree_URL, enc = "UTF8" )
+        // initialize: get to the first tree item 
         val response_Chars_Iterator: Iterator[Char] = github_API_Response_Buffered_Source
+            // to use .head lookup
             //?.buffered 
+            // Reuse: After calling this method, one should discard the iterator it was called on, and use only the iterator that was returned.
             .dropWhile( _ != '[' )
             .dropWhile( _ != '"' )
             //.drop(1)
-        
-        //@scala.annotation.tailrec
-        def get_Path_Value/*( path_Val: String = "" )*/: String = {
-            response_Chars_Iterator
-                .dropWhile( _ != ':' )
-                .dropWhile( _ != '"' )
-                .drop(1)
-                .takeWhile( _ != '"' )
-        }
-        def get_Path_Type_Value: String = {
-            response_Chars_Iterator
-                .dropWhile( _ != ':' )
-                .dropWhile( _ != ':' )
-                .dropWhile( _ != '"' )
-                .drop(1)
-                .takeWhile( _ != '"' )
-        }
-        def get_Path_SHA_Value: String = {
-            response_Chars_Iterator
-                .dropWhile( _ != ':' )
-                .dropWhile( _ != '"' )
-                .drop(1)
-                .takeWhile( _ != '"' )
-        }
-        // advance to next entry 
-        def skip_To_Next_Item: Unit = 
-            response_Chars_Iterator
-                .dropWhile( _ != '}' )
-                // expected to stop on '"' || c != ']'
-                .dropWhile( (c:Char) => c != '"' && c != ']' )
-        
         private 
         var hasnext = response_Chars_Iterator.hasNext
-        var path = ""
-        var path_Type = ""
-        var path_SHA = ""
+        
+        /** 
+        ' ' -> default start from 
+        '\t' -> flag indicates end of chars stream
+        */
+        @scala.annotation.tailrec
+        def skip_To_Char( 
+            c: Char = ' ', 
+            stop_At: Char = ':' 
+        ): Char = if( 
+            c == stop_At 
+        ){
+            c
+        }else{
+            if( response_Chars_Iterator.hasNext ){
+                skip_To_Char( c = response_Chars_Iterator.next() )
+            }else{
+                '\t'
+            }
+        }
+        
+        /** drop | consume | discard 'stop_At' or not ? */
+        @scala.annotation.tailrec
+        def take_Until_Char( 
+            result: String = "", 
+            c: Char = ' ', 
+            stop_At: Char = ':' 
+        ): String = if( 
+            c == stop_At 
+        ){
+            result
+        }else{
+            if( response_Chars_Iterator.hasNext ){
+                val current_Char: Char = response_Chars_Iterator.next()
+                
+                take_Until_Char( 
+                    result = result + current_Char,
+                    c = current_Char,
+                    stop_At = stop_At
+                )
+            }else{
+                ""
+            }
+        }
+
+        //@scala.annotation.tailrec
+        def get_Path_Value/*( path_Val: String = "" )*/: String = {
+            // mutate : Iterator[Char]
+            //response_Chars_Iterator
+                //.dropWhile( _ != ':' )
+                //.dropWhile( _ != '"' )
+                //.drop(1)
+                //.takeWhile( _ != '"' )
+            skip_To_Char( stop_At = ':' )
+            skip_To_Char( stop_At = '"' )
+            
+            if( response_Chars_Iterator.hasNext ){
+                response_Chars_Iterator.next()
+                
+                take_Until_Char( stop_At = '"' )
+            }else{
+                ""
+            }
+        }
+        def get_Path_Type_Value: String = {
+            // mutate : Iterator[Char]
+            /*response_Chars_Iterator
+                .dropWhile( _ != ':' )
+                .dropWhile( _ != ':' )
+                .dropWhile( _ != '"' )
+                .drop(1)
+                .takeWhile( _ != '"' )*/
+            skip_To_Char( stop_At = ':' )
+            
+            get_Path_Value//()
+        }
+        def get_Path_SHA_Value: String = {
+            // mutate : Iterator[Char]
+            /*response_Chars_Iterator
+                .dropWhile( _ != ':' )
+                .dropWhile( _ != '"' )
+                .drop(1)
+                .takeWhile( _ != '"' )*/
+            get_Path_Value//()
+        }
+        /**
+        // advance to next entry 
+        cases if next (discarding white spaces) after '}' is ','
+            -> has next item
+        else if ']'
+            -> end of items list (Done)
+        */
+        def skip_To_Next_Item: Unit = {
+            // mutate : Iterator[Char]
+            /*response_Chars_Iterator
+                .dropWhile( _ != '}' )
+                // expected to stop on '"' || c != ']'
+                .dropWhile( (c:Char) => c != '"' && c != ']' )*/
+            skip_To_Char( stop_At = '}' )
+        }
+        
+//         var path = ""
+//         var path_Type = ""
+//         var path_SHA = ""
 
         // or ends at ']'
         def hasNext: Boolean = hasnext
@@ -197,15 +270,22 @@ object GitHub_Repo_Content
             hasnext
         ) { 
             //val ( current_Path, current_Path_Type, current_Path_SHA ) = ( path, path_Type, path_SHA )
-            val current_Path = path
-            val current_Path_Type = path_Type
-            val current_Path_SHA = path_SHA
+            val current_Path = get_Path_Value//path
+            val current_Path_Type = get_Path_Type_Value//path_Type
+            val current_Path_SHA = get_Path_SHA_Value//path_SHA
             // reset
-            path = ""
-            path_Type = ""
-            path_SHA = ""
+//             path = ""
+//             path_Type = ""
+//             path_SHA = ""
+            skip_To_Next_Item
+            if( response_Chars_Iterator.hasNext ){
+                val c = response_Chars_Iterator.next()
+                if( c != ',' ){ hasnext = false }
+            }else{
+                hasnext = false
+            }
             
-            ( "path", "type", "sha" ) 
+            ( current_Path, current_Path_Type, current_Path_SHA ) 
         } else {
             github_API_Response_Buffered_Source.close()
             Iterator[ ( String, String, String ) ]().next()
