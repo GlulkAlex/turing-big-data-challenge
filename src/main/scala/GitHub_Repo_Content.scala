@@ -302,6 +302,57 @@ Repository(
     }
     }
     
+    /** from Base64 encoded string */
+    def decode_Base64_Content( content: String ): String = {
+        // decoded just fine from UTF-8 
+        // at https://www.base64decode.org/
+        // js 
+        // var decodedData = window.atob(encodedData); 
+        // decoded the string
+        val decoded_Content: String = new String(
+            // java.util.Base64.Decoder
+            Base64
+                                /*
+public static Base64.Decoder getDecoder()
+    Returns a Base64.Decoder 
+    that decodes using the Basic type base64 encoding scheme.
+                                */
+                //?.getDecoder
+                .getMimeDecoder
+                // java.lang.IllegalArgumentException: Illegal base64 character a
+                                /*
+public byte[] decode(String src)
+Decodes a Base64 encoded String 
+into a newly-allocated byte array 
+using the Base64 encoding scheme.
+An invocation of this method 
+has exactly the same effect 
+as invoking 
+decode(src.getBytes(StandardCharsets.ISO_8859_1))
+                                */
+                .decode(
+                    // java.lang.ClassCastException: scala.Some cannot be cast to java.lang.String
+                    content
+                        .get
+                        .asInstanceOf[String]
+                )
+        )
+        
+        decoded_Content
+    }
+    
+    /** Normalized: without empty strings and trailing spaces */
+    def drop_Empty_Lines_And_Trailing_Spaces_From_Content( 
+        content: String ): String = {
+        //println( "*" * 80 )
+        decoded_Content
+            .lines
+            //?.map( _.trim() )
+            .map( _.stripSuffix(" ") )
+            .filter( _ != "" )
+            .mkString("\n") 
+    }
+    
     /*
     Get contents
     This method returns 
@@ -316,13 +367,20 @@ Repository(
             Default: the repository’s default branch (usually master).
     To get contents: 
     */
-    if( 1 == 0 ){
+    def ( 
+        owner: String = "BugScanTeam",
+        repository_Name: String = "DNSLog",
+        path_File_Name: String = "dnslog/zoneresolver.py",
+        branch: Option[ String ] = Some("heads/master")
+        //1 == 0 
+    ): String = {
     val getContents = Github(accessToken)
         .repos
         .getContents(
             //>"47deg", "github4s", "README.md", Some("heads/master")
             // owner,  repository name, path + file name, branch 
-            "BugScanTeam", "DNSLog", "dnslog/zoneresolver.py", Some("heads/master")
+            //"BugScanTeam", "DNSLog", "dnslog/zoneresolver.py", Some("heads/master")
+            owner, repository_Name, path_File_Name, branch
         )
     /*
     case class Content(
@@ -390,52 +448,13 @@ constructor cannot be instantiated to expected type;
                     html_url: String,
                     download_url: Option[String] 
                 ), _ ) => if( content.nonEmpty ){
-                        // decoded just fine from UTF-8 
-                        // at https://www.base64decode.org/
-                        // js 
-                        // var decodedData = window.atob(encodedData); 
-                        // decoded the string
-                        val decoded_Content: String = new String(
-                            // java.util.Base64.Decoder
-                            Base64
-                                /*
-public static Base64.Decoder getDecoder()
-    Returns a Base64.Decoder 
-    that decodes using the Basic type base64 encoding scheme.
-                                */
-                                //?.getDecoder
-                                .getMimeDecoder
-                                // java.lang.IllegalArgumentException: Illegal base64 character a
-                                /*
-public byte[] decode(String src)
-Decodes a Base64 encoded String 
-into a newly-allocated byte array 
-using the Base64 encoding scheme.
-An invocation of this method 
-has exactly the same effect 
-as invoking 
-decode(src.getBytes(StandardCharsets.ISO_8859_1))
-                                */
-                                .decode(
-                                    // java.lang.ClassCastException: scala.Some cannot be cast to java.lang.String
-                                    content
-                                        .get
-                                        .asInstanceOf[String]
-                                )
-                        )
-                        println(s"${name} decoded_Content:\n${decoded_Content}")
-                        println( "*" * 80 )
-                        println( "Normalized: without empty strings and trailing spaces" )
-                        println( 
-                            decoded_Content
-                                .lines
-                                //?.map( _.trim() )
-                                .map( _.stripSuffix(" ") )
-                                .filter( _ != "" )
-                                .mkString("\n") 
-                            )
-                    }
-                case _ => println(s"""Unexpeced Github.repos.getContents():\n${r.result}""") 
+                    //println(s"${name} decoded_Content:\n${decoded_Content}")
+                    content
+                }else{""}
+                case _ => {
+                    println(s"""Unexpeced Github.repos.getContents():\n${r.result}""") 
+                    r.result.toString
+                }
             }
         }
     }
