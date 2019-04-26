@@ -215,7 +215,37 @@ class Test_JSON_Parser extends LambdaTest {
             assertEq( owner, "BugScanTeam", "Expected to be equal") +
             assertEq(name, "DNSLog", "Expected to be equal")
             //assert(3 == 5 - 2, "should work")
-        }
+        } + 
+        test("get Repos urls From CSV file Test") {
+            val repos_URLs_BufferedSource: scala.io.BufferedSource = scala.io.Source
+                .fromFile(
+                    name = "url_list.csv", 
+                    enc = "UTF8" 
+                )
+            // def getLines(): collection.Iterator[String]
+            //  Returns an iterator 
+            //  who returns lines (NOT including newline character(s)).
+            val repos_URLs_Iterator: collection.Iterator[String] = repos_URLs_BufferedSource
+                .getLines()
+            val csv_Header: String = repos_URLs_Iterator.next()
+            val top_9_Repos_List: List[String] = repos_URLs_Iterator.take(9).toList
+            
+            assertEq( 
+                csv_Header, 
+                "URLs", 
+                "Expected to be equal"
+            ) +
+            assertEq( 
+                top_9_Repos_List.head, 
+                "https://github.com/bitly/data_hacks", 
+                "Expected to be equal"
+            ) +
+            assertEq( 
+                top_9_Repos_List.last, 
+                "https://github.com/Cisco-Talos/ROPMEMU", 
+                "Expected to be equal" 
+            )
+        } 
     } 
 }
 
