@@ -128,33 +128,51 @@ object GitHub_Repo_Content
         path, type, sha
     from:
         { ...
+     drop until [ <- initialization start
         "tree": [ // children 
             {
+     drop until " <- initialization end
+           drop until : <- path extractor start
+             drop until "
+                        take until " <- path extractor end 
                 "path": ".gitignore",
+           drop until : <- type extractor start
+                     drop until ,
                 "mode": "100644",
+           drop until :
+             drop until "
+                  take until " <- type extractor end 
                 "type": "blob",
+          drop until : <- sha extractor start
+            drop until "
+                                                     take until " <- sha extractor end 
                 "sha": "9d0b71a3c79d2d3afbfa99269fea4280f5e73344",
                 for files only:
                     "size": 11,
                 "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/..."
+ drop until } <- skip to next item if any left 
+    check if , or not <- hasNext item check 
             }, ... ] ... }
     */
     def get_Current_Tree_Children_Props_Iterator( 
+        /// @toDo: pass scala.io.BufferedSource inside instead ?
+        /// for better testing ?
         // constructor parameter
-        tree_URL: String 
+        //tree_URL: String 
+        github_API_Response_Buffered_Source: scala.io.BufferedSource
     ): Iterator[ ( String, String, String ) ] = new scala.collection
         .AbstractIterator[ ( String, String, String ) ]{
         // get JSON from github API
-        val github_API_Response_Buffered_Source: scala.io.BufferedSource = 
-        scala.io.Source
-            .fromURL(s = tree_URL, enc = "UTF8" )
+//         val github_API_Response_Buffered_Source: scala.io.BufferedSource = 
+//         scala.io.Source
+//             .fromURL(s = tree_URL, enc = "UTF8" )
         // initialize: get to the first tree item 
-        val response_Chars_Iterator: Iterator[Char] = github_API_Response_Buffered_Source
+        val response_Chars_Iterator/*: Iterator[Char]*/ = github_API_Response_Buffered_Source
             // to use .head lookup
             //?.buffered 
             // Reuse: After calling this method, one should discard the iterator it was called on, and use only the iterator that was returned.
-            .dropWhile( _ != '[' )
-            .dropWhile( _ != '"' )
+            //.dropWhile( _ != '[' )
+            //.dropWhile( _ != '"' )
             //.drop(1)
         private 
         var hasnext = response_Chars_Iterator.hasNext
@@ -173,7 +191,9 @@ object GitHub_Repo_Content
             c
         }else{
             if( response_Chars_Iterator.hasNext ){
-                skip_To_Char( c = response_Chars_Iterator.next() )
+                val current_Char = response_Chars_Iterator.next()
+                
+                skip_To_Char( c = current_Char )
             }else{
                 '\t'
             }
@@ -290,6 +310,10 @@ object GitHub_Repo_Content
             github_API_Response_Buffered_Source.close()
             Iterator[ ( String, String, String ) ]().next()
         }
+        
+        // initialization
+        skip_To_Char( stop_At = '[' )
+        skip_To_Char( stop_At = '"' )
     }
     
     /// @toDo: implement 'get_Repo_Files_Paths_Names_Iterator'

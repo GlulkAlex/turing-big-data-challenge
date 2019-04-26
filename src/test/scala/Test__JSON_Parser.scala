@@ -263,19 +263,44 @@ class Test_JSON_Parser extends LambdaTest {
             )
         } + 
         test("get_Current_Tree_Children_Props_Iterator Test") {
-            /*val trees_BufferedSource: scala.io.BufferedSource = scala.io.Source
+            val trees_BufferedSource: scala.io.BufferedSource = scala.io.Source
                 .fromFile(
                     name = "./src/test/resources/repo_git_trees_url_response.json", 
                     enc = "UTF8" 
-                )*/
+                )
+            val tree_URL = "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439"
             val trees_Items_Iter = get_Current_Tree_Children_Props_Iterator( 
-                tree_URL = "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439"
+                //tree_URL = "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439"
+                github_API_Response_Buffered_Source = //>
+                    trees_BufferedSource
+                    //>scala.io.Source.fromURL(s = tree_URL, enc = "UTF8" )
             )
             
             assertEq( 
                 trees_Items_Iter.next(), 
                 //( "path", "type", "sha" ),
                 ( ".gitignore", "blob", "9d0b71a3c79d2d3afbfa99269fea4280f5e73344" ),
+                "Expected to be equal" 
+            ) + 
+            assertEq( 
+                // Unexpected exception: next on empty iterator
+                trees_Items_Iter.next(), 
+                ( "README.markdown", "blob", "053dae1ad11e6b864a97031430abd4d470c0ea34" ),
+                "Expected to be equal" 
+            ) + 
+            assertEq( 
+                trees_Items_Iter.next(), 
+                ( "data_hacks", "tree", "4cf5df18ec0052abf4d561c992f138ac144f8304" ),
+                "Expected to be equal" 
+            ) + 
+            assertEq( 
+                trees_Items_Iter.next(), 
+                ( "setup.py", "blob", "36fa158820c95e26d816f8f1bbfd962e1a482df9" ),
+                "Expected to be equal" 
+            ) + 
+            assertEq( 
+                trees_Items_Iter.hasNext, 
+                false,
                 "Expected to be equal" 
             ) 
         }
