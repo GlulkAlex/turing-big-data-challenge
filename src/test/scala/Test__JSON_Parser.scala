@@ -8,6 +8,10 @@ import JSON_Parser.{
     File_Props, get_Field_Name, 
     get_Field_Value, file_Props_Json_Parser, map_File_Props_Json
 }
+import GitHub_Repo_Content.{ 
+    decode_Base64_Content, 
+    drop_Empty_Lines_And_Trailing_Spaces_From_Content 
+}
 
     
 class Test_JSON_Parser extends LambdaTest {

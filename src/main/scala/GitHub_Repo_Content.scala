@@ -367,7 +367,7 @@ decode(src.getBytes(StandardCharsets.ISO_8859_1))
             Default: the repository’s default branch (usually master).
     To get contents: 
     */
-    def ( 
+    def repo_Get_File_Content( 
         owner: String = "BugScanTeam",
         repository_Name: String = "DNSLog",
         path_File_Name: String = "dnslog/zoneresolver.py",
