@@ -58,6 +58,12 @@ will be: Map( "root" -> Map {
   "nested object" -> Map{}, 
 }
 )
+
+[from:](https://github.com/47deg/LambdaTestCapture#example-json)
+Json objects are represented as
+    Map[String,Any] 
+and Json arrays are represented as 
+    List[Any]
 */
 object JSON_Parser {
     /**

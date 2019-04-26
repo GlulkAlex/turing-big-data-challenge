@@ -70,6 +70,7 @@
 "https://www.scala-sbt.org/1.x/docs/Library-Dependencies.html#Getting+the+right+Scala+version+with", 
 "https://www.scala-sbt.org/1.x/docs/Library-Management.html#Dependencies", 
 "https://ant.apache.org/ivy/history/2.3.0/ivyfile/dependency.html#revision", 
-"", 
+
+"https://github.com/47deg/LambdaTest/blob/master/lambdatest/src/test/scala/demo/Tag.scala", 
 "", 
 ]

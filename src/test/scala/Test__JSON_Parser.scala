@@ -54,29 +54,6 @@ class Test_JSON_Parser extends LambdaTest {
     // def filterNot(p: (Char) ⇒ Boolean): collection.Iterator[Char]
     println( test_Input.filter( (c: Char) => c != '\n' && c != ' ' ) )
     */
-    println( "#" * 80 )
-    println( "test_Input_1:" )
-    println( test_Input_1 )
-    println( "#" * 80 )
-    // def scala.io.Source.createBufferedSource(
-    //  inputStream: InputStream, bufferSize: Int = DefaultBufSize, reset: () ⇒ Source = null, close: () ⇒ Unit = null)(implicit codec: Codec): BufferedSource
-    //  Reads data from inputStream with a buffered reader, 
-    //  using the encoding in implicit parameter codec.
-    
-    // InputStream inputstream = new FileInputStream("c:\\data\\input-text.txt");
-    // ByteArrayInputStream(byte[] buf)
-    val ( f_1_N, b_It ) = get_Field_Name( 
-        //>test_Input_BS
-        //>test_Input_SBS
-        //>
-        test_Input_1
-        //>test_Input_2
-            .buffered,
-        is_DeBug_Mode = 1 == 0
-    )
-    println( s"f_1_N: `${f_1_N}`" )
-    val ( f_1_V, _ ) = get_Field_Value( b_It, is_DeBug_Mode = 1 == 0 )
-    println( s"f_1_V: `${f_1_V}`" )
 
     val act = /*label("Initial Tests") {
         test("Eq test") {
@@ -90,6 +67,33 @@ class Test_JSON_Parser extends LambdaTest {
         }
     } + */
     label("Json_Parser Tests") {
+        test("Json object field and name extractors test") {
+            println( "#" * 80 )
+            println( "test_Input_1:" )
+            println( test_Input_1 )
+            println( "#" * 80 )
+            // def scala.io.Source.createBufferedSource(
+            //  inputStream: InputStream, bufferSize: Int = DefaultBufSize, reset: () ⇒ Source = null, close: () ⇒ Unit = null)(implicit codec: Codec): BufferedSource
+            //  Reads data from inputStream with a buffered reader, 
+            //  using the encoding in implicit parameter codec.
+            
+            // InputStream inputstream = new FileInputStream("c:\\data\\input-text.txt");
+            // ByteArrayInputStream(byte[] buf)
+            val ( f_1_N, b_It ) = get_Field_Name( 
+                //>test_Input_BS
+                //>test_Input_SBS
+                //>
+                test_Input_1
+                //>test_Input_2
+                    .buffered,
+                is_DeBug_Mode = 1 == 0
+            )
+            //println( s"f_1_N: `${f_1_N}`" )
+            val ( f_1_V, _ ) = get_Field_Value( b_It, is_DeBug_Mode = 1 == 0 )
+            //println( s"f_1_V: `${f_1_V}`" )
+            assertEq(f_1_N, "name", "Expected to be equal") + 
+            assertEq(f_1_V, "symbols.py", "Expected to be equal")
+        } + 
         test("Extract file_Props") {
             println( "Parsing test_Input:" )
             //println( test_Input )
@@ -139,7 +143,7 @@ class Test_JSON_Parser extends LambdaTest {
             )
         } 
     } + 
-    label("Content Json Tests") {
+    label("Content Json Tests", tags = Set( "ignore" ) ) {
         test("get encoded file Content") {
             val encoded_File_Content: String = repo_Get_File_Content( 
                 owner = "pirate",//"BugScanTeam",
