@@ -159,7 +159,8 @@ object JSON_Parser {
         ),
         field_Quote: Char = '"',
         // ANSI escape sequences: backslash, \ the "Escape character"
-        //escaped_Symbol: Char = '\\',
+        //escaped_Symbol
+        backslash: Char = '\\',
         is_DeBug_Mode: Boolean = 1 == 0
     ): ( String, collection.BufferedIterator[Char] ) = if(
         buffered_Value_Iter.isEmpty
@@ -205,6 +206,15 @@ object JSON_Parser {
             /*}else if(char == escaped_Symbol){
                 if(is_DeBug_Mode){println(s"\t\t${value_Result} + '\''")}
                 value_Result + "\\"*/
+            }else if(
+                char == backslash 
+                // Returns next element of iterator without advancing beyond it.
+                && buffered_Value_Iter.head == 'n'
+            ){
+                // consume next 'n'
+                buffered_Value_Iter.next()
+                if(is_DeBug_Mode){println(s"\t\t${value_Result} + line feed")}
+                value_Result + "\n"
             }else{
                 if(is_DeBug_Mode){println(s"\t\t${value_Result} + ${char}")}
                 value_Result + char
