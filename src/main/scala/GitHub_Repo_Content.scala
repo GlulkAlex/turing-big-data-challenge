@@ -64,7 +64,8 @@ GET /repos/:owner/:repo/contents/:path
 "url": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md",
 */
 object GitHub_Repo_Content 
-    extends App {
+    //extends App 
+    {
     
     
     // scala.io.Codec -> final val UTF8: Codec

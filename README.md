@@ -63,9 +63,7 @@ inside VM running at `sbt`:
 `Ctrl+C`
 
 ## Running tests
-@toDo  
-( still not implemented  
-only exploratory testing available at the monent )
+( some unit tests implemented )
 ```sh
 $ sbt
 sbt:simple-spark-deploy> test
