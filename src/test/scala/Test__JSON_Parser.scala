@@ -60,10 +60,11 @@ class Test_JSON_Parser extends LambdaTest {
         //>
         test_Input_1
         //>test_Input_2
-            .buffered
+            .buffered,
+        is_DeBug_Mode = 1 == 1
     )
     println( s"f_1_N: `${f_1_N}`" )
-    val ( f_1_V, _ ) = get_Field_Value( b_It )
+    val ( f_1_V, _ ) = get_Field_Value( b_It, is_DeBug_Mode = 1 == 1 )
     println( s"f_1_V: `${f_1_V}`" )
 
   val act = /*label("Initial Tests") {
@@ -86,7 +87,8 @@ class Test_JSON_Parser extends LambdaTest {
             scala.io.Source.fromFile(
                 name = "./src/test/resources/test_input_1.json", 
                 enc = "UTF8" 
-            ).buffered 
+            ).buffered,
+            is_DeBug_Mode = 1 == 1
         )
         //println( s"extracted_Props: ${extracted_Props}" )
         val expected_Result = File_Props(
@@ -94,7 +96,7 @@ class Test_JSON_Parser extends LambdaTest {
             path = "symbols.py",
             size = 6824,
             `type` = "file",
-            content = "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\n"
+            content = "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
         )
         
         assertEq(extracted_Props, expected_Result, "Expected to be equal")
