@@ -76,6 +76,71 @@ object GitHub_Repo_Content
         val Array( repo_Name, repo_Owner ) = url.split("/").reverse.take(2)
         ( repo_Owner, repo_Name )
     }
+    
+    
+    /// @toDo: implement 'get_Repo_Files_Paths_Names_Iterator'
+    /** 
+    (BFS) traverse github api tree 
+    by repo link | url 
+    and eventually get all the 
+    "self": "https://api.github.com/repos/bitly/data_hacks/contents/setup.py?ref=master"
+    as tree leafs
+    with .contents field encoded text content 
+    i.e.
+    sollecting blob's sha 
+    
+    Optionally
+    exact folders structure 
+    with directories might be recreated 
+    or stored along with each file name
+    if needed 
+    but to get files's git/blobs/(sha).content only sha is actually needed 
+    
+    @return:
+        map file name to git/blobs/(sha)
+        api url prefix part might be constructed add added at any time 
+    */
+    def get_Repo_Files_Paths_Names_Iterator( 
+        // constructor parameter
+        repo_URL: String 
+    ): Iterator[ ( String, String ) ] = new scala.collection.AbstractIterator[ ( String, String ) ]{
+        private 
+        var hasnext = true
+        
+        def hasNext: Boolean = hasnext
+        def next(): ( String, String ) = if (
+            hasnext
+        ) { 
+            hasnext = false; 
+            "answer" -> "42" 
+        } else {
+            //!new //?scala.Nothing//?empty.next()
+            Iterator[ ( String, String ) ]().next()
+        }
+        // root source ?
+        //val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
+        // from master_Url.commit.commit.tree.url: 
+        //val tree_Root_Url = "https://api.github.com/repos/pirate/crypto-trader/git/trees/(sha)
+        // get 
+        /*"tree": [ {
+            "path": ".gitignore" | "data_hacks",
+            "mode": "100644",
+            "type": "blob" | "tree",
+            "sha": "9d0b71a3c79d2d3afbfa99269fea4280f5e73344",
+            "size": 11,
+            "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/9d0b71a3c79d2d3afbfa99269fea4280f5e73344"
+        }, ... ]*/
+        // then use 
+        //val repo_Git_Blobs_Encoded_File_Content_URL = ""("content")
+        // or compose:
+        // "url": "https://api.github.com/repos/pirate/crypto-trader/contents/setup.py" + ("?ref=master") // <- query string and ref part is | are optional 
+        // if fetch fails ( wrong file path name case ) it might retrun with:
+        // GET -> https://api.github.com/repos/pirate/crypto-trader/contents/setup.py
+        // { "message": "Not Found", "documentation_url": "https://developer.github.com/v3/repos/contents/#get-contents" }
+        // https://api.github.com/repos/pirate/crypto-trader/contents/.gitignore -> Ok
+        // response["content"] = "Lm15cHlfY2FjaGUvCnNlY3JldHMucHkKZGF0YS8KbWlzYy8K\n"
+    }
+    
     // scala.io.Codec -> final val UTF8: Codec
     // scala.io.Source.
     //  fromURL(url: URL, enc: String): BufferedSource

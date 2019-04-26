@@ -72,5 +72,7 @@
 "https://ant.apache.org/ivy/history/2.3.0/ivyfile/dependency.html#revision", 
 
 "https://github.com/47deg/LambdaTest/blob/master/lambdatest/src/test/scala/demo/Tag.scala", 
-"", 
+
+"https://docs.scala-lang.org/overviews/collections/iterators.html", 
+"https://docs.scala-lang.org/overviews/collections/iterators.html#buffered-iterators",
 ]
