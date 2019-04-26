@@ -106,7 +106,7 @@ class Test_JSON_Parser extends LambdaTest {
                 path = "symbols.py",
                 size = 6824,
                 `type` = "file",
-                content = "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
+                content = "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\n"
             )
             
             assertEq(extracted_Props, expected_Result, "Expected to be equal")
@@ -125,7 +125,7 @@ class Test_JSON_Parser extends LambdaTest {
                 "path" -> "symbols.py",
                 "size" -> "6824",
                 "type" -> "file",
-                "content" -> "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
+                "content" -> "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\n"
             )
             
             assertEq(
@@ -168,20 +168,36 @@ class Test_JSON_Parser extends LambdaTest {
             )
             println( "extracted_Props:" )
             println( extracted_Props )
-            val decoded_Content: String = new String(
+            println( "*#" * 40 )
+            val decoded_Content: String = /*new String(
                 Base64
                     .getMimeDecoder
                     // Unexpected exception: Input byte array has wrong 4-byte ending unit
                     .decode( extracted_Props("content") )
-            )
+            )*/
+                decode_Base64_Content( extracted_Props("content") )
+            println( "Normalized file content: without empty strings and trailing spaces:" )
+            println(
+                drop_Empty_Lines_And_Trailing_Spaces_From_Content( decoded_Content ) )
+            println( "#*" * 40 )
             val expected_Result = Map(
-                "lines" -> 42,
+                "lines" -> 208,
                 "size" -> "6824",
-                "content" -> "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
+                "content" -> "Currency types as defined here:"
             )
             
             assertEq(
-                decoded_Content.lines.toList.size, expected_Result("lines"), 
+                decoded_Content
+                    .lines
+                    .toList
+                    .size, expected_Result("lines"), 
+                "Expected to be equal"
+            ) + 
+            assertEq(
+                decoded_Content
+                    //.take(80), 
+                    .linesIterator.drop(1).next(),
+                    expected_Result("content"), 
                 "Expected to be equal"
             )
         }
