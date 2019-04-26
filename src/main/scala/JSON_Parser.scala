@@ -297,4 +297,38 @@ object JSON_Parser {
         )
         }
     }
+    
+    @scala.annotation.tailrec
+    def map_File_Props_Json(
+        buffered_Source_Iter: collection.BufferedIterator[Char], 
+        result: Map[ String, String ] = Map(),
+        is_DeBug_Mode: Boolean = 1 == 0
+    ): Map[ String, String ] = if(
+        buffered_Source_Iter.isEmpty
+    ){
+        result
+    }else{
+        val ( name: String, _ ) = get_Field_Name(
+                buffered_Field_Iter = buffered_Source_Iter,
+                is_DeBug_Mode = is_DeBug_Mode
+            )
+        val ( value: String, _ ) = get_Field_Value(
+                buffered_Value_Iter = buffered_Source_Iter,
+                is_DeBug_Mode = is_DeBug_Mode
+            )
+        if(is_DeBug_Mode){println(s"extracted field name: ${name}")}
+        if(is_DeBug_Mode && 1 == 1){println(value)}
+        val next_Result: Map[ String, String ] = result + ( name -> value )
+        
+        if( name == "content" ){
+            next_Result
+        }else{
+            map_File_Props_Json(
+                buffered_Source_Iter = buffered_Source_Iter, 
+                result = next_Result,
+                is_DeBug_Mode = is_DeBug_Mode
+            )
+        }
+    }
+
 }

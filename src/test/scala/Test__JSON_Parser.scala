@@ -2,12 +2,17 @@ package big_data
 //package demo
 
 import com.fortysevendeg.lambdatest._
+import java.util.Base64
+import java.util.Base64.Decoder
 import JSON_Parser.{ 
-    File_Props, get_Field_Name, get_Field_Value, file_Props_Json_Parser }
+    File_Props, get_Field_Name, 
+    get_Field_Value, file_Props_Json_Parser, map_File_Props_Json
+}
 
     
 class Test_JSON_Parser extends LambdaTest {
-    // https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py
+
+    //val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
     //# prettified ( actual respons is without spaces and lines ):
     // prettified
     // def scala.io.Source.fromFile(file: File, enc: String): BufferedSource
@@ -61,10 +66,10 @@ class Test_JSON_Parser extends LambdaTest {
         test_Input_1
         //>test_Input_2
             .buffered,
-        is_DeBug_Mode = 1 == 1
+        is_DeBug_Mode = 1 == 0
     )
     println( s"f_1_N: `${f_1_N}`" )
-    val ( f_1_V, _ ) = get_Field_Value( b_It, is_DeBug_Mode = 1 == 1 )
+    val ( f_1_V, _ ) = get_Field_Value( b_It, is_DeBug_Mode = 1 == 0 )
     println( s"f_1_V: `${f_1_V}`" )
 
   val act = /*label("Initial Tests") {
@@ -78,30 +83,76 @@ class Test_JSON_Parser extends LambdaTest {
       assert(3 == 5 - 2, "should work")
     }
   } + */
-  label("Json_Parser Tests") {
-    test("Extract file_Props") {
-        println( "Parsing test_Input:" )
-        //println( test_Input )
-        println( "Results:" )
-        val extracted_Props = file_Props_Json_Parser(
-            scala.io.Source.fromFile(
-                name = "./src/test/resources/test_input_1.json", 
-                enc = "UTF8" 
-            ).buffered,
-            is_DeBug_Mode = 1 == 1
-        )
-        //println( s"extracted_Props: ${extracted_Props}" )
-        val expected_Result = File_Props(
-            name= "symbols.py",
-            path = "symbols.py",
-            size = 6824,
-            `type` = "file",
-            content = "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
-        )
-        
-        assertEq(extracted_Props, expected_Result, "Expected to be equal")
+    label("Json_Parser Tests") {
+        test("Extract file_Props") {
+            println( "Parsing test_Input:" )
+            //println( test_Input )
+            println( "Results:" )
+            val extracted_Props = file_Props_Json_Parser(
+                scala.io.Source.fromFile(
+                    name = "./src/test/resources/test_input_1.json", 
+                    enc = "UTF8" 
+                ).buffered,
+                is_DeBug_Mode = 1 == 0
+            )
+            //println( s"extracted_Props: ${extracted_Props}" )
+            val expected_Result = File_Props(
+                name= "symbols.py",
+                path = "symbols.py",
+                size = 6824,
+                `type` = "file",
+                content = "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
+            )
+            
+            assertEq(extracted_Props, expected_Result, "Expected to be equal")
+        } + 
+        test("Map file_Props") {
+            val extracted_Props = map_File_Props_Json(
+                scala.io.Source.fromFile(
+                    name = "./src/test/resources/test_input_1.json", 
+                    enc = "UTF8" 
+                ).buffered,
+                is_DeBug_Mode = 1 == 0
+            )
+            //println( s"extracted_Props: ${extracted_Props}" )
+            val expected_Result = Map(
+                "name" -> "symbols.py",
+                "path" -> "symbols.py",
+                "size" -> "6824",
+                "type" -> "file",
+                "content" -> "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
+            )
+            
+            assertEq(extracted_Props("name"), expected_Result("name"), "Expected to be equal")
+            assertEq(extracted_Props("content"), expected_Result("content"), "Expected to be equal")
+        } 
+    } + 
+    label("Content Json Tests") {
+        test("decode file Content") {
+            val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
+            val extracted_Props = map_File_Props_Json(
+                scala.io.Source
+                    .fromURL(s = file_Content_Url, enc = "UTF8" )
+                    .buffered,
+                is_DeBug_Mode = 1 == 0
+            )
+            println( "extracted_Props:" )
+            println( extracted_Props )
+            val decoded_Content: String = new String(
+                Base64
+                    .getMimeDecoder
+                    // Unexpected exception: Input byte array has wrong 4-byte ending unit
+                    .decode( extracted_Props("content") )
+            )
+            val expected_Result = Map(
+                "lines" -> 42,
+                "size" -> "6824",
+                "content" -> "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
+            )
+            
+            assertEq(decoded_Content.lines.toList.size, expected_Result("lines"), "Expected to be equal")
+        }
     }
-  }
 }
 
 object Test_JSON_Parser extends App {
