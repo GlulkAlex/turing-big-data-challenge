@@ -309,7 +309,8 @@ Repository(
         // js 
         // var decodedData = window.atob(encodedData); 
         // decoded the string
-        val decoded_Content: String = new String(
+        //val decoded_Content: String = 
+        new String(
             // java.util.Base64.Decoder
             Base64
                                 /*
@@ -333,17 +334,19 @@ decode(src.getBytes(StandardCharsets.ISO_8859_1))
                 .decode(
                     // java.lang.ClassCastException: scala.Some cannot be cast to java.lang.String
                     content
-                        .get
-                        .asInstanceOf[String]
+                        // for Option[String]
+//                         .get
+//                         .asInstanceOf[String]
                 )
         )
         
-        decoded_Content
+        //decoded_Content
     }
     
     /** Normalized: without empty strings and trailing spaces */
     def drop_Empty_Lines_And_Trailing_Spaces_From_Content( 
-        content: String ): String = {
+        decoded_Content: String 
+    ): String = {
         //println( "*" * 80 )
         decoded_Content
             .lines
@@ -374,14 +377,14 @@ decode(src.getBytes(StandardCharsets.ISO_8859_1))
         branch: Option[ String ] = Some("heads/master")
         //1 == 0 
     ): String = {
-    val getContents = Github(accessToken)
-        .repos
-        .getContents(
-            //>"47deg", "github4s", "README.md", Some("heads/master")
-            // owner,  repository name, path + file name, branch 
-            //"BugScanTeam", "DNSLog", "dnslog/zoneresolver.py", Some("heads/master")
-            owner, repository_Name, path_File_Name, branch
-        )
+        val getContents = Github(accessToken)
+            .repos
+            .getContents(
+                //>"47deg", "github4s", "README.md", Some("heads/master")
+                // owner,  repository name, path + file name, branch 
+                //"BugScanTeam", "DNSLog", "dnslog/zoneresolver.py", Some("heads/master")
+                owner, repository_Name, path_File_Name, branch
+            )
     /*
     case class Content(
     `type`: String,
@@ -415,48 +418,51 @@ decode(src.getBytes(StandardCharsets.ISO_8859_1))
         )
     )
     */
-    getContents.exec[ cats.Id, HttpResponse[String] ]() match {
-        case Left(e) => println(s"Something went wrong: ${e.getMessage}")
-        // The result on the right 
-        // is the corresponding NonEmptyList[Content].
-        case Right(r) => {
-            // return ?
-            r.result match {
+        getContents.exec[ cats.Id, HttpResponse[String] ]() match {
+            case Left(e) => {
+                //println(s"Something went wrong: ${e.getMessage}") 
+                e.getMessage
+            }
+            // The result on the right 
+            // is the corresponding NonEmptyList[Content].
+            case Right(r) => {
+                // return ?
+                r.result match {
                 /*
 constructor cannot be instantiated to expected type;
 [error]  found   : github4s.free.domain.Content
 [error]  required: cats.data.NonEmptyList[github4s.free.domain.Content]
                 */
-                // final case class NonEmptyList[+A](head: A, tail: List[A]) extends Product with Serializable
-                case NonEmptyList( content_Container @ Content(
-                    // to turn the ( lower cased ) pattern into a stable identifier pattern
-                    // work around, here for reserved word with `backticks`
-                    // with scalaVersion := "2.11.9" -> get:
-                    //? Pattern variables must start with a lower-case letter. (SLS 8.1.1.)
-                    //`type`: String,
-                    type_Str: String,
-                    encoding: Option[String],
-                    target: Option[String],
-                    submodule_git_url: Option[String],
-                    size: Int,
-                    name: String,
-                    path: String,
-                    content: Option[String],
-                    sha: String,
-                    url: String,
-                    git_url: String,
-                    html_url: String,
-                    download_url: Option[String] 
-                ), _ ) => if( content.nonEmpty ){
-                    //println(s"${name} decoded_Content:\n${decoded_Content}")
-                    content
-                }else{""}
-                case _ => {
-                    println(s"""Unexpeced Github.repos.getContents():\n${r.result}""") 
-                    r.result.toString
+                    // final case class NonEmptyList[+A](head: A, tail: List[A]) extends Product with Serializable
+                    case NonEmptyList( content_Container @ Content(
+                        // to turn the ( lower cased ) pattern into a stable identifier pattern
+                        // work around, here for reserved word with `backticks`
+                        // with scalaVersion := "2.11.9" -> get:
+                        //? Pattern variables must start with a lower-case letter. (SLS 8.1.1.)
+                        //`type`: String,
+                        type_Str: String,
+                        encoding: Option[String],
+                        target: Option[String],
+                        submodule_git_url: Option[String],
+                        size: Int,
+                        name: String,
+                        path: String,
+                        content: Option[String],
+                        sha: String,
+                        url: String,
+                        git_url: String,
+                        html_url: String,
+                        download_url: Option[String] 
+                    ), _ ) => if( content.nonEmpty ){
+                        //println(s"${name} decoded_Content:\n${decoded_Content}")
+                        content.get
+                    }else{""}
+                    case _ => {
+                        println(s"""Unexpeced Github.repos.getContents():\n${r.result}""") 
+                        r.result.toString
+                    }
                 }
             }
         }
-    }
     }
 }

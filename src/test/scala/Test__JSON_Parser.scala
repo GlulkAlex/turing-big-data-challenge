@@ -9,6 +9,7 @@ import JSON_Parser.{
     get_Field_Value, file_Props_Json_Parser, map_File_Props_Json
 }
 import GitHub_Repo_Content.{ 
+    repo_Get_File_Content,
     decode_Base64_Content, 
     drop_Empty_Lines_And_Trailing_Spaces_From_Content 
 }
@@ -76,17 +77,17 @@ class Test_JSON_Parser extends LambdaTest {
     val ( f_1_V, _ ) = get_Field_Value( b_It, is_DeBug_Mode = 1 == 0 )
     println( s"f_1_V: `${f_1_V}`" )
 
-  val act = /*label("Initial Tests") {
-    test("Eq test") {
-      assertEq(2 + 1, 3, "Int eq test")
-    }
-  } +
-  label("Simple Tests") {
-    test("Assert Test") {
-      assertEq(1, 2, "Bad Int eq test") +
-      assert(3 == 5 - 2, "should work")
-    }
-  } + */
+    val act = /*label("Initial Tests") {
+        test("Eq test") {
+        assertEq(2 + 1, 3, "Int eq test")
+        }
+    } +
+    label("Simple Tests") {
+        test("Assert Test") {
+        assertEq(1, 2, "Bad Int eq test") +
+        assert(3 == 5 - 2, "should work")
+        }
+    } + */
     label("Json_Parser Tests") {
         test("Extract file_Props") {
             println( "Parsing test_Input:" )
@@ -127,11 +128,36 @@ class Test_JSON_Parser extends LambdaTest {
                 "content" -> "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
             )
             
-            assertEq(extracted_Props("name"), expected_Result("name"), "Expected to be equal")
-            assertEq(extracted_Props("content"), expected_Result("content"), "Expected to be equal")
+            assertEq(
+                extracted_Props("name"), expected_Result("name"), 
+                "Expected to be equal"
+            ) + 
+            assertEq(
+                extracted_Props("content"), expected_Result("content"), 
+                "Expected to be equal"
+            )
         } 
     } + 
     label("Content Json Tests") {
+        test("get encoded file Content") {
+            val encoded_File_Content: String = repo_Get_File_Content( 
+                owner = "pirate",//"BugScanTeam",
+                repository_Name = "crypto-trader",//"DNSLog",
+                path_File_Name = "symbols.py",//"dnslog/zoneresolver.py",
+                branch = Some("heads/master")
+                //1 == 0 
+            )
+            val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
+            val extracted_Props = map_File_Props_Json(
+                scala.io.Source
+                    .fromURL(s = file_Content_Url, enc = "UTF8" )
+                    .buffered,
+                is_DeBug_Mode = 1 == 0
+            )
+            val content_Base64: String = extracted_Props("content")
+            
+            assertEq(content_Base64, encoded_File_Content, "Expected to be equal")
+        } + 
         test("decode file Content") {
             val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
             val extracted_Props = map_File_Props_Json(
@@ -154,7 +180,10 @@ class Test_JSON_Parser extends LambdaTest {
                 "content" -> "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\\n"
             )
             
-            assertEq(decoded_Content.lines.toList.size, expected_Result("lines"), "Expected to be equal")
+            assertEq(
+                decoded_Content.lines.toList.size, expected_Result("lines"), 
+                "Expected to be equal"
+            )
         }
     }
 }
