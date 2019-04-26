@@ -28,8 +28,12 @@
 
 "locally:spark-2.4.1-bin-hadoop2.7/examples/src/main/scala/org/apache/spark/examples",
 "https://spark.apache.org/docs/latest/spark-standalone.html", 
+"https://spark.apache.org/docs/latest/spark-standalone.html#launching-spark-applications",
 "https://spark.apache.org/docs/latest/spark-standalone.html#monitoring-and-logging", 
 "https://spark.apache.org/docs/latest/spark-standalone.html#connecting-an-application-to-the-cluster", 
+"https://spark.apache.org/docs/latest/rdd-programming-guide.html#passing-functions-to-spark",
+"https://spark.apache.org/docs/latest/rdd-programming-guide.html#parallelized-collections",
+"https://spark.apache.org/docs/latest/rdd-programming-guide.html#external-datasets",
 "https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.io.LZFCompressionCodec", 
 "https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#manually-specifying-options", 
 

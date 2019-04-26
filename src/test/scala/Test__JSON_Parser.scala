@@ -11,7 +11,8 @@ import JSON_Parser.{
 import GitHub_Repo_Content.{ 
     repo_Get_File_Content,
     decode_Base64_Content, 
-    drop_Empty_Lines_And_Trailing_Spaces_From_Content 
+    drop_Empty_Lines_And_Trailing_Spaces_From_Content, 
+    get_Repo_Owner_And_Name_From_URL
 }
 
     
@@ -201,7 +202,17 @@ class Test_JSON_Parser extends LambdaTest {
                 "Expected to be equal"
             )
         }
-    }
+    } + // get_Repo_Owner_And_Name_From_URL
+    label("Utils Tests") {
+        test("extract Repo_Owner_And_Name_From_URL Test") {
+            val url = "https://github.com/BugScanTeam/DNSLog"
+            val ( owner, name ) = get_Repo_Owner_And_Name_From_URL( url )
+        
+            assertEq( owner, "BugScanTeam", "Expected to be equal") +
+            assertEq(name, "DNSLog", "Expected to be equal")
+            //assert(3 == 5 - 2, "should work")
+        }
+    } 
 }
 
 object Test_JSON_Parser extends App {

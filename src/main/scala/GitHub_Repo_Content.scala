@@ -67,7 +67,15 @@ object GitHub_Repo_Content
     //extends App 
     {
     
-    
+    /** 
+    'https://github.com/BugScanTeam/DNSLog'
+    */
+    def get_Repo_Owner_And_Name_From_URL( 
+        url: String 
+    ): ( String, String ) = {
+        val Array( repo_Name, repo_Owner ) = url.split("/").reverse.take(2)
+        ( repo_Owner, repo_Name )
+    }
     // scala.io.Codec -> final val UTF8: Codec
     // scala.io.Source.
     //  fromURL(url: URL, enc: String): BufferedSource

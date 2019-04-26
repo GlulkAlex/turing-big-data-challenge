@@ -55,7 +55,8 @@ to run job on local Spark cluster:
 $ sbt
 sbt:simple-spark-deploy> run
 ```
-`Spark` comes with a `spark-submit` script  
+`Spark` comes with a [`spark-submit` script]("https://spark.apache.org/docs/latest/spark-standalone.html#launching-spark-applications",
+)  
 which can be used to submit job to the cluster.  
 
 ## shutting down server:
@@ -63,7 +64,7 @@ inside VM running at `sbt`:
 `Ctrl+C`
 
 ## Running tests
-( some unit tests implemented )
+( some unit tests ( is | have been ) implemented )
 ```sh
 $ sbt
 sbt:simple-spark-deploy> test

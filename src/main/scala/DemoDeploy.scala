@@ -143,6 +143,7 @@ distFile: org.apache.spark.rdd.RDD[String] = data.txt MapPartitionsRDD[10] at te
         and lines output to its stdout 
         are returned as an RDD of strings.
     */
+    /// @toDo: use url_list.csv to initialize RDD 
     /*
     scala> val distFile_RDD = sc.textFile("../url_list.csv")
 distFile_RDD: org.apache.spark.rdd.RDD[String] = ../url_list.csv MapPartitionsRDD[1] at textFile at <console>:24
@@ -173,8 +174,18 @@ res24: Long = 100001
     val totalLength = lineLengths.reduce((a, b) => a + b)
     */
     val counts = rdd
+        /// @toDo: pass data retrieval and statistics extractor(s) function(s) in the driver program
         .flatMap(line => line.split(" "))
         .map(word => (word, 1))
+        /// @toDo: add | implement ?
+        // Accumulators are variables 
+        // that are only “added” to 
+        // through an associative and commutative operation 
+        // and can therefore be efficiently supported in parallel. 
+        // They can be used 
+        // to implement counters (as in MapReduce) or sums. 
+        // Spark natively supports accumulators of numeric types, 
+        // and programmers can add support for new types.
         .reduceByKey(_ + _)
         .collect()
     /*
