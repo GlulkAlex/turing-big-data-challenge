@@ -12,7 +12,8 @@ import GitHub_Repo_Content.{
     repo_Get_File_Content,
     decode_Base64_Content, 
     drop_Empty_Lines_And_Trailing_Spaces_From_Content, 
-    get_Repo_Owner_And_Name_From_URL
+    get_Repo_Owner_And_Name_From_URL,
+    get_Repo_Master_Tree_Root_URL
 }
 
     
@@ -245,7 +246,21 @@ class Test_JSON_Parser extends LambdaTest {
                 "https://github.com/Cisco-Talos/ROPMEMU", 
                 "Expected to be equal" 
             )
-        } 
+        } + 
+        test("get_Repo_Master_Tree_Root_URL Test") {
+            assertEq( 
+                get_Repo_Master_Tree_Root_URL(), 
+                "https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724",
+                "Expected to be equal" 
+            ) + 
+            assertEq( 
+                get_Repo_Master_Tree_Root_URL(
+                    master_Url = "https://api.github.com/repos/bitly/data_hacks/branches/master"
+                ),
+                "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439",
+                "Expected to be equal" 
+            )
+        }
     } 
 }
 

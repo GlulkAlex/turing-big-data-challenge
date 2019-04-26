@@ -104,19 +104,6 @@ object GitHub_Repo_Content
         // constructor parameter
         repo_URL: String 
     ): Iterator[ ( String, String ) ] = new scala.collection.AbstractIterator[ ( String, String ) ]{
-        private 
-        var hasnext = true
-        
-        def hasNext: Boolean = hasnext
-        def next(): ( String, String ) = if (
-            hasnext
-        ) { 
-            hasnext = false; 
-            "answer" -> "42" 
-        } else {
-            //!new //?scala.Nothing//?empty.next()
-            Iterator[ ( String, String ) ]().next()
-        }
         // root source ?
         //val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
         // from master_Url.commit.commit.tree.url: 
@@ -139,48 +126,70 @@ object GitHub_Repo_Content
         // { "message": "Not Found", "documentation_url": "https://developer.github.com/v3/repos/contents/#get-contents" }
         // https://api.github.com/repos/pirate/crypto-trader/contents/.gitignore -> Ok
         // response["content"] = "Lm15cHlfY2FjaGUvCnNlY3JldHMucHkKZGF0YS8KbWlzYy8K\n"
+        val ( owner, name ) = get_Repo_Owner_And_Name_From_URL( repo_URL )
+        val master_Url = s"https://api.github.com/repos/${owner}/${name}/branches/master"
+        private 
+        var hasnext = true
+        
+        def hasNext: Boolean = hasnext
+        
+        def next(): ( String, String ) = if (
+            hasnext
+        ) { 
+            hasnext = false; 
+            "answer" -> "42" 
+        } else {
+            //!new //?scala.Nothing//?empty.next()
+            Iterator[ ( String, String ) ]().next()
+        }
     }
     
-    // scala.io.Codec -> final val UTF8: Codec
-    // scala.io.Source.
-    //  fromURL(url: URL, enc: String): BufferedSource
-    //  creates Source from file with given file: URI
-    // fromURL(s: String)(implicit codec: Codec): BufferedSource
-    //    same as fromURL(new URL(s))
-    // fromURL(s: String, enc: String): BufferedSource
-    //  same as fromURL(new URL(s))(Codec(enc))
-    // scala.io.BufferedSource.
-    //  getLines(): collection.Iterator[String]
-    //  Returns an iterator who returns lines (NOT including newline character(s)).
-    val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
-    // get JSON from github API
-    val github_API_Response_Source = scala.io.Source
-        //? required: java.net.URL
-        .fromURL(s = master_Url, enc = "UTF8" )
-    
-    //>println( github_API_Response_Source.mkString )
-    val repo_Master_Tree_Root_URL: String = github_API_Response_Source
-        //?.getLines()
-        // startsWith(String prefix)
-        //.dropWhile( _.trim().startsWith("\"tree\"") )
-        .mkString
-// scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).filter( _.endsWith("}") ).head
-// res11: String = "url":"https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724"}
-// scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).drop(1 ).head
-// res12: String = "url":"https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724"}
-//scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).drop(1 ).head.drop(7).stripSuffix("\"}")
-//res13: String = https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724
-        // found   : Array[String]
-        .split(",")
-        .dropWhile( !_.startsWith("\"tree\"") )
-        .drop(1)
-        .head
-        .drop(7)
-        .stripSuffix("\"}")
+    def get_Repo_Master_Tree_Root_URL(
+        master_Url: String = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
+    ): String = {
+        // scala.io.Codec -> final val UTF8: Codec
+        // scala.io.Source.
+        //  fromURL(url: URL, enc: String): BufferedSource
+        //  creates Source from file with given file: URI
+        // fromURL(s: String)(implicit codec: Codec): BufferedSource
+        //    same as fromURL(new URL(s))
+        // fromURL(s: String, enc: String): BufferedSource
+        //  same as fromURL(new URL(s))(Codec(enc))
+        // scala.io.BufferedSource.
+        //  getLines(): collection.Iterator[String]
+        //  Returns an iterator who returns lines (NOT including newline character(s)).
+        //val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
+        // get JSON from github API
+        val github_API_Response_Source = scala.io.Source
+            //? required: java.net.URL
+            .fromURL(s = master_Url, enc = "UTF8" )
         
-    println( s"repo_Master_Tree_Root_URL: ${repo_Master_Tree_Root_URL}" )
-    // clean up ? releasing resource ? 
-    github_API_Response_Source.close()
+        //>println( github_API_Response_Source.mkString )
+        val repo_Master_Tree_Root_URL: String = github_API_Response_Source
+            //?.getLines()
+            // startsWith(String prefix)
+            //.dropWhile( _.trim().startsWith("\"tree\"") )
+            .mkString
+    // scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).filter( _.endsWith("}") ).head
+    // res11: String = "url":"https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724"}
+    // scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).drop(1 ).head
+    // res12: String = "url":"https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724"}
+    //scala> s.split(",").dropWhile( !_.startsWith("\"tree\"") ).drop(1 ).head.drop(7).stripSuffix("\"}")
+    //res13: String = https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724
+            // found   : Array[String]
+            .split(",")
+            .dropWhile( !_.startsWith("\"tree\"") )
+            .drop(1)
+            .head
+            .drop(7)
+            .stripSuffix("\"}")
+            
+        println( s"repo_Master_Tree_Root_URL: ${repo_Master_Tree_Root_URL}" )
+        // clean up ? releasing resource ? 
+        github_API_Response_Source.close()
+        
+        repo_Master_Tree_Root_URL
+    }
     
     val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
     
