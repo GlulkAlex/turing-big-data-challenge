@@ -347,4 +347,225 @@ object JSON_Parser {
         }
     }
 
+    trait Char_Result
+    object Start_From extends Char_Result
+    object No_Next extends Char_Result
+    case class Current_Char( c: Char ) extends Char_Result
+    /** 
+    ' ' -> default start from 
+    '\t' -> flag indicates end of chars stream
+    */
+    @scala.annotation.tailrec
+    def skip_After_Char( 
+        c: Char = ' ', 
+        stop_At: Char = ':',
+        // mutated state 
+        chars_Iterator: scala.io.BufferedSource
+    ): Char = if( 
+        c == stop_At 
+    ){
+        c
+    }else{
+        if( chars_Iterator.hasNext ){
+            val current_Char = chars_Iterator.next()
+            
+            skip_After_Char( 
+                c = current_Char, 
+                // whatch it ! if passing comething different from default 
+                stop_At = stop_At,
+                chars_Iterator = chars_Iterator
+            )
+        }else{
+            '\t'
+        }
+    }
+    
+    trait Field_Value_Result
+    object Empty_Value extends Field_Value_Result
+    object Not_Found extends Field_Value_Result
+    case class Value_Accum( a: String ) extends Field_Value_Result
+    /** drop | consume | discard 'stop_At' or not ? */
+    @scala.annotation.tailrec
+    def take_Until_Char( 
+        result: String = "", 
+        c: Char = ' ', 
+        stop_At: Char = ':', 
+        // mutated state 
+        chars_Iterator: scala.io.BufferedSource
+    ): String = if( 
+        c == stop_At 
+    ){
+        result
+    }else{
+        if( chars_Iterator.hasNext ){
+            val current_Char: Char = chars_Iterator.next()
+            
+            take_Until_Char( 
+                result = result + current_Char,
+                c = current_Char,
+                // whatch it ! if passing comething different from default 
+                stop_At = stop_At,
+                chars_Iterator = chars_Iterator
+            )
+        }else{
+            ""
+        }
+    }
+    
+    /**
+    extract:
+        path, type, sha
+    from JSON:
+        { ...
+     drop until [ <- initialization start | list items start tag | event 
+        "tree": [ // children 
+ item start { tag | event 
+            { 
+     drop until " <- initialization end | item fist field start 
+                      : key -> value separator tag | event 
+           drop until : <- path extractor start
+             drop until "
+                        take until " <- path extractor end 
+                "path": ".gitignore",
+           drop until : <- type extractor start
+                     drop until ,
+                "mode": "100644",
+           drop until :
+             drop until "
+                  take until " <- type extractor end 
+                "type": "blob",
+          drop until : <- sha extractor start
+            drop until "
+                                                     take until " <- sha extractor end 
+                "sha": "9d0b71a3c79d2d3afbfa99269fea4280f5e73344",
+                for files only:
+                    "size": 11,
+                "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/..."
+  item end  } tag | event if no ',' ater then list end as well | too
+ drop until } <- skip to next item if any left 
+    check if , or not <- hasNext item check 
+            }, 
+stop iterator at] <- list items stop event | flag | mark | tag
+            ... ] 
+        ... }
+        
+    so it can be combined from:
+    list extractor -> item extractor -> fields and values extractor 
+    */
+    def get_Current_Tree_Children_Props_Iterator( 
+        /// @toDo: pass scala.io.BufferedSource inside instead ?
+        /// for better testing ?
+        // constructor parameter
+        //tree_URL: String 
+        github_API_Response_Buffered_Source: scala.io.BufferedSource
+    ): Iterator[ ( String, String, String ) ] = new scala.collection
+        .AbstractIterator[ ( String, String, String ) ]{
+        // get JSON from github API
+//         val github_API_Response_Buffered_Source: scala.io.BufferedSource = 
+//         scala.io.Source
+//             .fromURL(s = tree_URL, enc = "UTF8" )
+        // initialize: get to the first tree item 
+        val response_Chars_Iterator/*: Iterator[Char]*/ = github_API_Response_Buffered_Source
+            // to use .head lookup
+            //?.buffered 
+            // Reuse: After calling this method, one should discard the iterator it was called on, and use only the iterator that was returned.
+            //.dropWhile( _ != '[' )
+            //.dropWhile( _ != '"' )
+            //.drop(1)
+        private 
+        var hasnext = response_Chars_Iterator.hasNext
+        
+        //@scala.annotation.tailrec
+        def get_Path_Value/*( path_Val: String = "" )*/: String = {
+            // mutate : Iterator[Char]
+            //response_Chars_Iterator
+                //.dropWhile( _ != ':' )
+                //.dropWhile( _ != '"' )
+                //.drop(1)
+                //.takeWhile( _ != '"' )
+            skip_After_Char( stop_At = ':', chars_Iterator = response_Chars_Iterator )
+            skip_After_Char( stop_At = '"', chars_Iterator = response_Chars_Iterator )
+            
+            if( response_Chars_Iterator.hasNext ){
+                response_Chars_Iterator.next()
+                
+                take_Until_Char( stop_At = '"', chars_Iterator = response_Chars_Iterator )
+            }else{
+                ""
+            }
+        }
+        def get_Path_Type_Value: String = {
+            // mutate : Iterator[Char]
+            /*response_Chars_Iterator
+                .dropWhile( _ != ':' )
+                .dropWhile( _ != ':' )
+                .dropWhile( _ != '"' )
+                .drop(1)
+                .takeWhile( _ != '"' )*/
+            skip_After_Char( stop_At = ':', chars_Iterator = response_Chars_Iterator )
+            
+            get_Path_Value//()
+        }
+        def get_Path_SHA_Value: String = {
+            // mutate : Iterator[Char]
+            /*response_Chars_Iterator
+                .dropWhile( _ != ':' )
+                .dropWhile( _ != '"' )
+                .drop(1)
+                .takeWhile( _ != '"' )*/
+            get_Path_Value//()
+        }
+        /**
+        // advance to next entry 
+        cases if next (discarding white spaces) after '}' is ','
+            -> has next item
+        else if ']'
+            -> end of items list (Done)
+        */
+        def skip_To_Next_Item: Unit = {
+            // mutate : Iterator[Char]
+            /*response_Chars_Iterator
+                .dropWhile( _ != '}' )
+                // expected to stop on '"' || c != ']'
+                .dropWhile( (c:Char) => c != '"' && c != ']' )*/
+            skip_After_Char( stop_At = '}', chars_Iterator = response_Chars_Iterator )
+        }
+        
+//         var path = ""
+//         var path_Type = ""
+//         var path_SHA = ""
+
+        // or ends at ']'
+        def hasNext: Boolean = hasnext
+        
+        def next(): ( String, String, String ) = if (
+            hasnext
+        ) { 
+            //val ( current_Path, current_Path_Type, current_Path_SHA ) = ( path, path_Type, path_SHA )
+            val current_Path = get_Path_Value//path
+            val current_Path_Type = get_Path_Type_Value//path_Type
+            val current_Path_SHA = get_Path_SHA_Value//path_SHA
+            // reset
+//             path = ""
+//             path_Type = ""
+//             path_SHA = ""
+            skip_To_Next_Item
+            if( response_Chars_Iterator.hasNext ){
+                val c = response_Chars_Iterator.next()
+                if( c != ',' ){ hasnext = false }
+            }else{
+                hasnext = false
+            }
+            
+            ( current_Path, current_Path_Type, current_Path_SHA ) 
+        } else {
+            github_API_Response_Buffered_Source.close()
+            Iterator[ ( String, String, String ) ]().next()
+        }
+        
+        // initialization
+        skip_After_Char( stop_At = '[', chars_Iterator = response_Chars_Iterator )
+        skip_After_Char( stop_At = '"', chars_Iterator = response_Chars_Iterator )
+    }
+    
 }
