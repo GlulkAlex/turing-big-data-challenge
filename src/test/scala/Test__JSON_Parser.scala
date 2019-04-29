@@ -16,7 +16,8 @@ import GitHub_Repo_Content.{
     decode_Base64_Content, 
     drop_Empty_Lines_And_Trailing_Spaces_From_Content, 
     get_Repo_Owner_And_Name_From_URL,
-    get_Repo_Master_Tree_Root_URL
+    get_Repo_Master_Tree_Root_URL,
+    get_Repo_Files_Paths_Names_Iterator
 }
 
     
@@ -147,8 +148,8 @@ class Test_JSON_Parser extends LambdaTest {
             )
         } 
     } + 
-    label("Content Json Tests", tags = Set( "ignore" ) ) {
-        test("get encoded file Content") {
+    label("Content Json Tests", tags = Set( /*"ignore"*/ ) ) {
+        test("get encoded file Content", tags = Set( "ignore" )) {
             val encoded_File_Content: String = repo_Get_File_Content( 
                 owner = "pirate",//"BugScanTeam",
                 repository_Name = "crypto-trader",//"DNSLog",
@@ -167,7 +168,7 @@ class Test_JSON_Parser extends LambdaTest {
             
             assertEq(content_Base64, encoded_File_Content, "Expected to be equal")
         } + 
-        test("decode file Content") {
+        test("decode file Content", tags = Set( "ignore" )) {
             val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
             val extracted_Props = map_File_Props_Json(
                 scala.io.Source
@@ -305,6 +306,30 @@ class Test_JSON_Parser extends LambdaTest {
                 false,
                 "Expected to be equal" 
             ) 
+        } + 
+        test("get_Repo_Files_Paths_Names_Iterator Test") {
+            val repo_Files_Iter = get_Repo_Files_Paths_Names_Iterator(
+                repo_URL = "https://github.com/bitly/data_hacks"
+            )
+            val expected = Map(
+                "bar_chart.py" -> "1",
+                "histogram.py" -> "2",
+                "ninety_five_percent.py" -> "3",
+                "run_for.py" -> "5",
+                "sample.py" -> "6",
+                "setup.py" -> "7"
+            )
+            
+            /*assertEq( 
+                repo_Files_Iter.next(), 
+                ("setup.py", "26e721b5e45fab0b7ba722e56136fef58a696724"),
+                "Expected to be equal" 
+            ) + */
+            assertEq( 
+                repo_Files_Iter.toMap, 
+                expected,
+                "Expected to be equal" 
+            )// + 
         }
     } 
 }

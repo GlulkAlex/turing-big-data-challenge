@@ -156,7 +156,7 @@ object GitHub_Repo_Content
     */
     def get_Repo_Files_Paths_Names_Iterator( 
         // constructor parameter
-        repo_URL: String 
+        repo_URL: String = "https://github.com/bitly/data_hacks"
     ): Iterator[ ( String, String ) ] = new scala.collection.AbstractIterator[ ( String, String ) ]{
         // root source ?
         //val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
@@ -185,7 +185,7 @@ object GitHub_Repo_Content
         val master_Tree_Root_URL: String = get_Repo_Master_Tree_Root_URL(
             master_Url = master_Url
         )
-        /// @toDo: store | maintain stack of 
+        /// @Done: store | maintain stack of 
         /// get_Current_Tree_Children_Props_Iterator(s)
         /// as hasNext stop condition 
         private 
@@ -221,7 +221,8 @@ object GitHub_Repo_Content
                         )
                     )
                     next()
-                }else{
+                }else{// if( type_Str == "blob" ){
+                    /// @toDo: add "*.py" filter ?
                     //"answer" -> "42" 
                     path -> sha
                 }
