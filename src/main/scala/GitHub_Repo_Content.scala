@@ -16,6 +16,14 @@ import scalaj.http.HttpResponse
 
 import cats.data.NonEmptyList 
 
+import JSON_Parser.{ 
+//     File_Props, get_Field_Name, 
+//     get_Field_Value, 
+//     file_Props_Json_Parser, 
+//     map_File_Props_Json,
+    get_Current_Tree_Children_Props_Iterator
+}
+
 
 /**
 # get all *.py files in repo with relative path names included 
@@ -174,19 +182,53 @@ object GitHub_Repo_Content
         // response["content"] = "Lm15cHlfY2FjaGUvCnNlY3JldHMucHkKZGF0YS8KbWlzYy8K\n"
         val ( owner, name ) = get_Repo_Owner_And_Name_From_URL( repo_URL )
         val master_Url = s"https://api.github.com/repos/${owner}/${name}/branches/master"
-        val Master_Tree_Root_URL: String = get_Repo_Master_Tree_Root_URL(
+        val master_Tree_Root_URL: String = get_Repo_Master_Tree_Root_URL(
             master_Url = master_Url
         )
+        /// @toDo: store | maintain stack of 
+        /// get_Current_Tree_Children_Props_Iterator(s)
+        /// as hasNext stop condition 
         private 
-        var hasnext = true
+        //var hasnext = true
+        var tree_Children_Iterators_Stack = List(
+            get_Current_Tree_Children_Props_Iterator( 
+                github_API_Response_Buffered_Source = scala.io.Source
+                    .fromURL(
+                        s = master_Tree_Root_URL, 
+                        enc = "UTF8" 
+                    )
+            )
+        )
         
-        def hasNext: Boolean = hasnext
+        def hasNext: Boolean = tree_Children_Iterators_Stack.nonEmpty
         
         def next(): ( String, String ) = if (
-            hasnext
+            hasNext
         ) { 
-            hasnext = false; 
-            "answer" -> "42" 
+            // pop head
+            val top_Head = tree_Children_Iterators_Stack.head
+            //hasnext = false 
+            if( top_Head.hasNext ){
+                val ( path, type_Str, sha ) = top_Head.next()
+                if( type_Str == "tree" ){
+                    tree_Children_Iterators_Stack.::(
+                        get_Current_Tree_Children_Props_Iterator( 
+                            github_API_Response_Buffered_Source = scala.io.Source
+                                .fromURL(
+                                    s = s"https://api.github.com/repos/${owner}/${name}/git/trees/${sha}", 
+                                    enc = "UTF8" 
+                                )
+                        )
+                    )
+                    next()
+                }else{
+                    //"answer" -> "42" 
+                    path -> sha
+                }
+            }else{
+                tree_Children_Iterators_Stack = tree_Children_Iterators_Stack.tail
+                next()
+            }
         } else {
             //!new //?scala.Nothing//?empty.next()
             Iterator[ ( String, String ) ]().next()
