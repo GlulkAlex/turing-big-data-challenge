@@ -384,7 +384,14 @@ object JSON_Parser {
     object Empty_Value extends Field_Value_Result
     object Not_Found extends Field_Value_Result
     case class Value_Accum( a: String ) extends Field_Value_Result
-    /** drop | consume | discard 'stop_At' or not ? */
+    
+    /** 
+    drop | consume | discard 'stop_At' or not ? 
+    
+    variants:
+    - take while not found 'stop_At' ( included )
+    - take until not found 'stop_At' ( excluded )
+    */
     @scala.annotation.tailrec
     def take_Until_Char( 
         result: String = "", 
@@ -399,9 +406,14 @@ object JSON_Parser {
     }else{
         if( chars_Iterator.hasNext ){
             val current_Char: Char = chars_Iterator.next()
+            val next_Result: String = if( current_Char == stop_At ){
+                result
+            }else{
+                result + current_Char
+            }
             
             take_Until_Char( 
-                result = result + current_Char,
+                result = next_Result,
                 c = current_Char,
                 // whatch it ! if passing comething different from default 
                 stop_At = stop_At,
