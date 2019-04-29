@@ -158,6 +158,7 @@ Optimisations:
   for a much faster method ?
 
 statistics ​only for the Python code​ present.  
+Note: some repos have | contain also `*.pyi` files ( Stub files )
 Here is the list of items  
 that you need to compute  
 for each repository:

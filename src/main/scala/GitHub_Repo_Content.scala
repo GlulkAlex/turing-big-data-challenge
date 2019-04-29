@@ -306,6 +306,41 @@ res7: Int = 4
         }
     }
     
+    /**
+    Number of lines of code​ per file 
+    ( this excludes: comments, whitespaces, blank lines ).
+    => drop: 
+        start from '#'
+        lines only from '\t', ' ' and '\n'
+    /// @whatAbout: docstrings ?
+        """
+        """
+
+    */
+    /**
+    aggregate Number of lines of code​ per file 
+    as repository total
+    */
+    /**
+    List of​ external libraries/packages​ used.  
+    - setup and requirments if present ?  
+        not all repos have 'requirements.txt' or 'setup.py'
+    or 
+    - set over used imports ?
+    
+    e.g.
+    import sys                  +1
+    or
+    import lib1 as l1, lib2 as l2, lib3, lib4 as l4, lib5
+    from decimal import Decimal +1 <- "easy" case because one 'from'
+    but this also possible:
+    from ..filters import equalizer <- local import with path
+        used leading dots 
+        to indicate the current and parent packages 
+        involved in the relative import
+    -> then filter non match(ing) of repo's files | scripts 
+    */
+
     val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
     
     /*
