@@ -487,7 +487,7 @@ stop iterator at] <- list items stop event | flag | mark | tag
             skip_After_Char( stop_At = '"', chars_Iterator = response_Chars_Iterator )
             
             if( response_Chars_Iterator.hasNext ){
-                response_Chars_Iterator.next()
+                //?response_Chars_Iterator.next()
                 
                 take_Until_Char( stop_At = '"', chars_Iterator = response_Chars_Iterator )
             }else{
