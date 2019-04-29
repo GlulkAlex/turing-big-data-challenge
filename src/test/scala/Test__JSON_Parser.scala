@@ -311,6 +311,33 @@ class Test_JSON_Parser extends LambdaTest {
             val repo_Files_Iter = get_Repo_Files_Paths_Names_Iterator(
                 repo_URL = "https://github.com/bitly/data_hacks"
             )
+            /*
+$ tar -tf data_hacks__repo.tar.gz
+bitly-data_hacks-c66693b/
+bitly-data_hacks-c66693b/.gitignore                         1
+bitly-data_hacks-c66693b/README.markdown                    2
+bitly-data_hacks-c66693b/data_hacks/
+bitly-data_hacks-c66693b/data_hacks/bar_chart.py            3
+bitly-data_hacks-c66693b/data_hacks/histogram.py            4
+bitly-data_hacks-c66693b/data_hacks/ninety_five_percent.py  5
+bitly-data_hacks-c66693b/data_hacks/run_for.py              6
+bitly-data_hacks-c66693b/data_hacks/sample.py               7
+bitly-data_hacks-c66693b/setup.py                           8
+
+extracted path: .gitignore, type: blob, sha: 9d0b71a3c79d2d3afbfa99269fea4280f5e73344
+extracted path: README.markdown, type: blob, sha: 053dae1ad11e6b864a97031430abd4d470c0ea34
+extracted path: data_hacks, type: tree, sha: 4cf5df18ec0052abf4d561c992f138ac144f8304
+	appending data_hacks tree iterator
+extracted path: bar_chart.py, type: blob, sha: c68af8b0a36dd63b4f1db715ecb7fc70117f3d5a
+extracted path: histogram.py, type: blob, sha: 3d16cc8ea06336ccdfd5f59ead8ba606f35b9fbe
+extracted path: ninety_five_percent.py, type: blob, sha: 141022706121b2f8154daf8151524be51ab803fd
+extracted path: run_for.py, type: blob, sha: a8ea21fd805750461c4e376a19f1dc73aa4a0572
+extracted path: sample.py, type: blob, sha: c3296ab48412690b593dae188ced2f6be2ff0caa
+top_Head.isEmpty: <iterator>
+extracted path: setup.py, type: blob, sha: 36fa158820c95e26d816f8f1bbfd962e1a482df9
+top_Head.isEmpty: <iterator>
+tree_Children_Iterators_Stack.isEmpty: List()
+            */
             val expected = Map(
                 "bar_chart.py" -> "1",
                 "histogram.py" -> "2",
@@ -326,7 +353,15 @@ class Test_JSON_Parser extends LambdaTest {
                 "Expected to be equal" 
             ) + */
             assertEq( 
-                repo_Files_Iter.toMap, 
+                repo_Files_Iter.hasNext, 
+                true,
+                "Expected to be equal" 
+            ) + 
+            assertEq( 
+                repo_Files_Iter
+                    //>.take(8)
+                    //.take(8)
+                    .toMap, 
                 expected,
                 "Expected to be equal" 
             )// + 

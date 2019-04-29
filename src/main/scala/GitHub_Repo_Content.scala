@@ -132,6 +132,30 @@ object GitHub_Repo_Content
         repo_Master_Tree_Root_URL
     }
     
+    /**
+scala> example_Iterator().size
+res7: Int = 4
+    */
+    def example_Iterator( 
+        start_From: Int = 0,
+        stop_At: Int = 3
+    ): Iterator[ Int ] = new scala.collection.AbstractIterator[ Int ]{
+        private 
+        var state_Counter = start_From
+        
+        def hasNext: Boolean = state_Counter <= stop_At
+        
+        def next(): Int = if (
+            hasNext
+        ) { 
+            state_Counter += 1
+            state_Counter
+        } else {
+            // java.util.NoSuchElementException: next on empty iterator
+            Iterator[ Int ]().next()
+        }
+    }
+    
     /// @toDo: implement 'get_Repo_Files_Paths_Names_Iterator'
     /** 
     (BFS) traverse github api tree 
@@ -156,7 +180,8 @@ object GitHub_Repo_Content
     */
     def get_Repo_Files_Paths_Names_Iterator( 
         // constructor parameter
-        repo_URL: String = "https://github.com/bitly/data_hacks"
+        repo_URL: String = "https://github.com/bitly/data_hacks",
+        is_DeBug_Mode: Boolean = 1 == 1
     ): Iterator[ ( String, String ) ] = new scala.collection.AbstractIterator[ ( String, String ) ]{
         // root source ?
         //val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
@@ -200,7 +225,10 @@ object GitHub_Repo_Content
             )
         )
         
-        def hasNext: Boolean = tree_Children_Iterators_Stack.nonEmpty
+        def hasNext: Boolean = (
+            tree_Children_Iterators_Stack.nonEmpty
+            && tree_Children_Iterators_Stack.head.hasNext
+        )
         
         def next(): ( String, String ) = if (
             hasNext
@@ -210,8 +238,12 @@ object GitHub_Repo_Content
             //hasnext = false 
             if( top_Head.hasNext ){
                 val ( path, type_Str, sha ) = top_Head.next()
+                if(is_DeBug_Mode){println(s"extracted path: ${path}, type: ${type_Str}, sha: ${sha}")}
                 if( type_Str == "tree" ){
-                    tree_Children_Iterators_Stack.::(
+                    if(is_DeBug_Mode){println(s"\tappending ${path} ${type_Str} iterator")}
+                    /// @toDo: fix this conditional branch
+                    // mutate iterator's state 
+                    tree_Children_Iterators_Stack = tree_Children_Iterators_Stack.::(
                         get_Current_Tree_Children_Props_Iterator( 
                             github_API_Response_Buffered_Source = scala.io.Source
                                 .fromURL(
@@ -226,11 +258,16 @@ object GitHub_Repo_Content
                     //"answer" -> "42" 
                     path -> sha
                 }
-            }else{
+            }else{// top_Head.isEmpty 
+                if(is_DeBug_Mode){println(s"top_Head.isEmpty: ${top_Head}")}
+                /// @toDo: fix this conditional branch ?
+                // hasNext guarantees at least head item in current sack
                 tree_Children_Iterators_Stack = tree_Children_Iterators_Stack.tail
                 next()
             }
         } else {
+            if(is_DeBug_Mode){println(s"tree_Children_Iterators_Stack.isEmpty: ${tree_Children_Iterators_Stack}")}
+            // Unexpected exception: next on empty iterator
             //!new //?scala.Nothing//?empty.next()
             Iterator[ ( String, String ) ]().next()
         }

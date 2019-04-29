@@ -26,7 +26,21 @@ $ curl -L https://api.github.com/repos/bitly/data_hacks/tarball > data_hacks__re
 
 2. filter `*.py` files  
 unfiltered archive content ( folders and files ):  
+short form:
+$ tar -tf data_hacks__repo.tar.gz
+bitly-data_hacks-c66693b/
+bitly-data_hacks-c66693b/.gitignore
+bitly-data_hacks-c66693b/README.markdown
+bitly-data_hacks-c66693b/data_hacks/
+bitly-data_hacks-c66693b/data_hacks/bar_chart.py
+bitly-data_hacks-c66693b/data_hacks/histogram.py
+bitly-data_hacks-c66693b/data_hacks/ninety_five_percent.py
+bitly-data_hacks-c66693b/data_hacks/run_for.py
+bitly-data_hacks-c66693b/data_hacks/sample.py
+bitly-data_hacks-c66693b/setup.py
 $ tar -tvf data_hacks__repo.tar.gz
+or
+$ tar --list --verbose --file=data_hacks__repo.tar.gz
 drwxrwxr-x root/root         0 2018-03-14 02:08 bitly-data_hacks-c66693b/
 -rw-rw-r-- root/root        11 2018-03-14 02:08 bitly-data_hacks-c66693b/.gitignore
 -rw-rw-r-- root/root      3941 2018-03-14 02:08 bitly-data_hacks-c66693b/README.markdown
