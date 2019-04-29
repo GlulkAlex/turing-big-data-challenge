@@ -346,6 +346,12 @@ tree_Children_Iterators_Stack.isEmpty: List()
                 "sample.py" -> "6",
                 "setup.py" -> "7"
             )
+// scala> Map("1"->1,"2"->2).keys
+// res0: Iterable[String] = Set(1, 2)
+// scala> Map("1"->1,"2"->2).keys == Map("2"->2,"1"->1).keys
+// res1: Boolean = true
+// scala> Map("1"->1,"2"->2).keys == Map("2"->2,"3"->3).keys
+// res2: Boolean = false
             
             /*assertEq( 
                 repo_Files_Iter.next(), 
@@ -361,8 +367,9 @@ tree_Children_Iterators_Stack.isEmpty: List()
                 repo_Files_Iter
                     //>.take(8)
                     //.take(8)
-                    .toMap, 
-                expected,
+                    .toMap
+                    .keys, 
+                expected.keys,
                 "Expected to be equal" 
             )// + 
         }

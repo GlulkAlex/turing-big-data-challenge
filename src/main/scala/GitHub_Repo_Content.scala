@@ -85,7 +85,21 @@ object GitHub_Repo_Content
         ( repo_Owner, repo_Name )
     }
     
+/*
+HTTP 403 is a standard HTTP status code 
+communicated to clients by an HTTP server 
+to indicate 
+that access to the requested (valid) URL by the client 
+is Forbidden for some reason. 
+The server understood the request, 
+but will not fulfill it 
+due to client related issues. 
+There are a number of sub-status error codes 
+that provide a more specific reason 
+for responding with the 403 status code.
+*/
     /** from response JSON */
+    @throws(classOf[java.io.IOException])
     def get_Repo_Master_Tree_Root_URL(
         master_Url: String = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
     ): String = {
@@ -101,6 +115,15 @@ object GitHub_Repo_Content
         //  getLines(): collection.Iterator[String]
         //  Returns an iterator who returns lines (NOT including newline character(s)).
         //val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
+        
+        /// @toDo: @handleThis: with Try ?
+        // Unexpected exception: Server returned HTTP response code: 403 for URL: https://api.github.com/repos/bitly/data_hacks/branches/master
+        // java.net.URL
+        // URL(String spec)
+        //  Creates a URL object from the String representation.
+        // url.openStream()
+        // public final InputStream openStream() throws IOException
+        // java.io.IOException
         // get JSON from github API
         val github_API_Response_Source: scala.io.BufferedSource = scala.io.Source
             .fromURL(s = master_Url, enc = "UTF8" )
@@ -181,7 +204,8 @@ res7: Int = 4
     def get_Repo_Files_Paths_Names_Iterator( 
         // constructor parameter
         repo_URL: String = "https://github.com/bitly/data_hacks",
-        is_DeBug_Mode: Boolean = 1 == 1
+        has_Suffix: String = ".py",
+        is_DeBug_Mode: Boolean = 1 == 0
     ): Iterator[ ( String, String ) ] = new scala.collection.AbstractIterator[ ( String, String ) ]{
         // root source ?
         //val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
@@ -241,7 +265,7 @@ res7: Int = 4
                 if(is_DeBug_Mode){println(s"extracted path: ${path}, type: ${type_Str}, sha: ${sha}")}
                 if( type_Str == "tree" ){
                     if(is_DeBug_Mode){println(s"\tappending ${path} ${type_Str} iterator")}
-                    /// @toDo: fix this conditional branch
+                    /// @Done: @fixEd this conditional branch
                     // mutate iterator's state 
                     tree_Children_Iterators_Stack = tree_Children_Iterators_Stack.::(
                         get_Current_Tree_Children_Props_Iterator( 
@@ -256,11 +280,20 @@ res7: Int = 4
                 }else{// if( type_Str == "blob" ){
                     /// @toDo: add "*.py" filter ?
                     //"answer" -> "42" 
-                    path -> sha
+// scala> "42".endsWith("2")
+// res0: Boolean = true
+// scala> "42".endsWith("")
+// res1: Boolean = true
+// scala> "42".endsWith("a")
+// res2: Boolean = false
+                    if( path.endsWith( has_Suffix ) ){
+                        path -> sha
+                    }else{
+                        next()
+                    }
                 }
             }else{// top_Head.isEmpty 
                 if(is_DeBug_Mode){println(s"top_Head.isEmpty: ${top_Head}")}
-                /// @toDo: fix this conditional branch ?
                 // hasNext guarantees at least head item in current sack
                 tree_Children_Iterators_Stack = tree_Children_Iterators_Stack.tail
                 next()
