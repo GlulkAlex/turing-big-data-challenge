@@ -18,20 +18,10 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.201-b09, mixed mode)
   $ cat ./project/build.properties
   sbt.version=1.2.8
   ```
-  [detailed instructions at](https://www.scala-sbt.org/download.html)
+  [detailed `sbt` installation instructions](https://www.scala-sbt.org/download.html)
 
 ### Configuring 
 @toDo  
-
-### unpacking archive:
-from `latest.tar.bz2` file  
-to destination folder  
-or  
-### cloning from local repository bundle file  
-( and checkout to branch 'master' )  
-```sh
-$ git clone -b master git_tree_replica.bundle ../local_Repo_Clone
-```
 
 ### installing dependencies  
 automatically from `build.sbt` after:
@@ -42,7 +32,8 @@ $ sbt
 ### How to run:
 [how to start up a Spark cluster  
 on Amazon Web Services (AWS)  
-using the Flintrock command-line tool](https://heather.miller.am/blog/launching-a-spark-cluster-part-1.html#setting-up-flintrock-and-amazon-web-services)
+using the Flintrock command-line tool](https://heather.miller.am/blog/launching-a-spark-cluster-part-1.html#setting-up-flintrock-and-amazon-web-services)  
+
 ### general workflow steps:
 1. Develop locally.
 2. When ready to deploy, compile, package up `jars` to send to cluster.
