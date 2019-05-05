@@ -82,4 +82,23 @@
 "https://docs.python.org/3/reference/import.html",
 "https://docs.python.org/3/tutorial/modules.html#packages",
 
+"https://monix.io/docs/3x/execution/scheduler.html#schedule-with-a-delay",
+"https://monix.io/docs/3x/eval/task.html#delay-execution",
+"https://monix.io/docs/3x/eval/task.html#delay-signaling-of-the-result",
+"https://monix.io/docs/3x/eval/task.html#restart-until-predicate-is-true",
+"retry with exponential backof ->",
+"https://monix.io/docs/3x/eval/task.html#restart-on-error",
+"https://monix.io/docs/3x/eval/task.html#clean-up-resources-on-finish",
+"https://monix.io/docs/3x/eval/task.html#trigger-a-timeout",
+"https://monix.io/docs/3x/eval/task.html#design-summary",
+"https://monix.io/docs/3x/eval/task.html#taskcreate",
+"https://monix.io/docs/3x/eval/task.html#gather-results-from-a-seq-of-tasks",
+"https://monix.io/docs/3x/execution/callback.html",
+
+"https://www.tutorialspoint.com/java/util/timer_delay.htm",
+"https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledThreadPoolExecutor.html",
+"https://java2blog.com/java-scheduledthreadpoolexecutor-example/",
+"https://www.mkyong.com/java/java-scheduledexecutorservice-examples/",
+
+"projects/Akka/Intertrust/src/test/scala/LambdaTest_event_Delay.scala"
 ]

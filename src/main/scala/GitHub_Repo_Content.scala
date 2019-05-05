@@ -16,6 +16,8 @@ import scalaj.http.HttpResponse
 
 import cats.data.NonEmptyList 
 
+import scala.util.{ Try, Success, Failure }
+
 import JSON_Parser.{ 
 //     File_Props, get_Field_Name, 
 //     get_Field_Value, 
@@ -118,6 +120,17 @@ for responding with the 403 status code.
         
         /// @toDo: @handleThis: with Try ?
         // Unexpected exception: Server returned HTTP response code: 403 for URL: https://api.github.com/repos/bitly/data_hacks/branches/master
+/*
+  val file_Content = Try(
+    scala.io.Source.fromFile(name = f_Name, enc = "utf-8").getLines()
+  )
+  file_Content match {
+    case Success(f_C) => f_C
+    //scala> Iterator[String]()
+    //res762: Iterator[String] = empty iterator
+    case Failure(e) => Iterator[String]()
+  }
+*/
         // java.net.URL
         // URL(String spec)
         //  Creates a URL object from the String representation.

@@ -86,3 +86,7 @@ libraryDependencies += "com.47deg" %% "github4s" % "0.20.1"
 libraryDependencies += "com.47deg" % "lambda-test_2.12" % "1.3.1" % "test"
 testFrameworks += new TestFramework(
     "com.fortysevendeg.lambdatest.sbtinterface.LambdaFramework")
+
+// for the JVM
+//?libraryDependencies += "io.monix" %% "monix" % "3.0.0-RC2"
+
