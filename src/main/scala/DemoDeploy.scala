@@ -1,10 +1,18 @@
 package demodeploy
 
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
+//import org.apache.spark.SparkConf
+//import org.apache.spark.SparkContext
+import org.apache.spark.{ SparkConf, SparkContext }
+// (Before Spark 1.3.0, 
+// you need to explicitly import org.apache.spark.SparkContext._ 
+// to enable essential implicit conversions.)
 import org.apache.spark.SparkContext._
 
 import org.apache.spark.rdd.RDD
+// object DataFrame is not a member of package org.apache.spark.sql
+// needed libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.0"
+//import org.apache.spark.sql.DataFrame
+//import org.apache.spark.sql.SparkSession
 
 import java.net.URL
 
@@ -94,6 +102,23 @@ String appName
     //PropertyConfigurator.configure( log_Config )
     // it works but has no noticible effect 
     //PropertyConfigurator.configure("src/main/resources/log4j.properties")
+    /*
+    The class org.apache.log4j.Logger is not serializable 
+    which implies we cannot use it inside a closure 
+    while doing operations on some parts of the Spark API.
+
+    noted 
+    how the log object has been marked as @transient 
+    which allows the serialization system to ignore the log object.
+    */
+    @transient lazy val c_Log = org.apache.log4j.LogManager.getLogger("Spark_Closure_Logger")
+    val log = LogManager.getRootLogger
+    
+    //>log.setLevel(Level.WARN)
+    //?LogManager.getLogger("DAGScheduler").setLevel(Level.WARN)
+    //?LogManager.getLogger("SparkContext").setLevel(Level.WARN)
+    
+    def words_Count(): Unit = {
     /* 
     $ ./sbin/start-master.sh
 starting org.apache.spark.deploy.master.Master, logging to /home/gluk-alex/Documents/projects/turing.com/spark-2.4.1-bin-hadoop2.7/logs/spark-gluk-alex-org.apache.spark.deploy.master.Master-1-glukalex-desktop.out
@@ -127,22 +152,6 @@ stopping org.apache.spark.deploy.master.Master
     val sc = new SparkContext(conf)
     // newLevel
     //sc.setLogLevel("WARN")
-    
-    /*
-The class org.apache.log4j.Logger is not serializable 
-which implies we cannot use it inside a closure 
-while doing operations on some parts of the Spark API.
-
-noted 
-how the log object has been marked as @transient 
-which allows the serialization system to ignore the log object.
-    */
-    @transient lazy val c_Log = org.apache.log4j.LogManager.getLogger("Spark_Closure_Logger")
-    val log = LogManager.getRootLogger
-    
-    //>log.setLevel(Level.WARN)
-    //?LogManager.getLogger("DAGScheduler").setLevel(Level.WARN)
-    //?LogManager.getLogger("SparkContext").setLevel(Level.WARN)
     
     log.warn("Hello demo")
     
@@ -246,7 +255,7 @@ res24: Long = 100001
     // Finally, we run reduce, which is an action.
     val totalLength = lineLengths.reduce((a, b) => a + b)
     */
-    val counts = rdd
+    val counts/*: Array[(String, Int)]*/ = rdd
         /// @toDo: pass data retrieval 
         /// and statistics extractor(s) function(s) to | in the driver program
         .flatMap(line => line.split(" "))
@@ -268,7 +277,10 @@ res24: Long = 100001
         // Spark natively supports accumulators of numeric types, 
         // and programmers can add support for new types.
         .reduceByKey(_ + _)
-        .collect()
+        // aggregateByKey(zeroValue)(seqOp, combOp, [numPartitions])
+        // path
+        //.saveAsTextFile( "result.json" )
+        //.collect()
     /*
     To print all elements on the driver, 
     one can use the collect() method 
@@ -282,7 +294,52 @@ res24: Long = 100001
     a safer approach is to use the take(): 
         rdd.take(100).foreach(println).
     */
-    counts foreach println
+    if( 1 == 0 ){ 
+    counts
+        .collect()
+        .foreach( println )}
+    /// @toDo: check directory existance and remove it ?
+    /// @toDo: lame solution @removeIt altogether 
+    counts
+        .map{ case ( word, count ) => s"""{\"${word}\": ${count}},""" }
+        // Write the elements of the dataset 
+        // as a text file (or set of text files) 
+        // in a given directory 
+        // in the local filesystem
+        // org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory file:/../projects/turing.com/result.json already exists
+        // WARN FileSystem: exception in the cleaner thread but it will continue to run
+        .saveAsTextFile( "result.json" )
+    /*
+    Spark is friendly to unit testing 
+    with any popular unit test framework. 
+    Simply create a SparkContext in your test 
+    with the master URL set to `local`, 
+    run your operations, 
+    and then 
+    call SparkContext.stop() 
+    to tear it down. 
+    Make sure 
+    you stop the context 
+    within a finally block 
+    or the test framework’s tearDown method, 
+    as Spark does not support two contexts running concurrently 
+    in the same program.
+    */
+    sc.stop()
+    }
+    
+//     def data_Frame_Example(): Unit = {
+//     
+//         val spark = SparkSession
+//             .builder()
+//             .appName("Spark SQL data sources example")
+//             //?.config("spark.some.config.option", "some-value")
+//             .getOrCreate()
+//         // For implicit conversions like converting RDDs to DataFrames
+//         // Primitive types (Int, String, etc) and Product types (case classes) encoders are
+//         // supported by importing this when creating a Dataset.
+//         import spark.implicits._
+
     /*
     val sparkDF = spark
         .read
@@ -336,24 +393,31 @@ res36: String = https://github.com/bitly/data_hacks
 scala> sparkDF.count()
 res33: Long = 100000
     */
-    
-    /*
-    Spark is friendly to unit testing 
-    with any popular unit test framework. 
-    Simply create a SparkContext in your test 
-    with the master URL set to `local`, 
-    run your operations, 
-    and then 
-    call SparkContext.stop() 
-    to tear it down. 
-    Make sure 
-    you stop the context 
-    within a finally block 
-    or the test framework’s tearDown method, 
-    as Spark does not support two contexts running concurrently 
-    in the same program.
-    */
-    sc.stop()
+//         val spark_DF/*: DataFrame*/ = spark
+//             // value read is not a member of org.apache.spark.SparkContext
+//             .read
+//             .format("csv")
+//             .option("header", "true")
+//             .option("inferSchema", "true")
+//             .load("./url_list.csv")
+//         
+//         // Looks the schema of this DataFrame.
+//         spark_DF.printSchema()
+//         // Saves countsByAge to S3 in the JSON format.
+//         //countsByAge
+//         spark_DF
+//             .count()
+//             .write
+//             .format("json")
+//             .save(
+//                 //"s3a://..."
+//                 "result.json"
+//             )
+//         
+//         spark.stop()
+//     }
+
+    words_Count()
     
     log.warn("I am done")
   }

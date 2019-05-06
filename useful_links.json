@@ -37,9 +37,11 @@
 "https://spark.apache.org/docs/latest/rdd-programming-guide.html#external-datasets",
 "https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.io.LZFCompressionCodec", 
 "https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#manually-specifying-options", 
+"https://spark.apache.org/docs/latest/sql-getting-started.html#type-safe-user-defined-aggregate-functions",
 
 "https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/util/Utils.scala#L462", 
 "https://github.com/apache/spark/blob/39f75b45889951b175c48b2e849e920d0a0eee6e/core/src/main/scala/org/apache/spark/SparkContext.scala#L1511", 
+"https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/sql/SQLDataSourceExample.scala",
 
 "https://hackernoon.com/how-to-log-in-apache-spark-f4204fad78a",
 "https://hackernoon.com/how-to-log-in-apache-spark-a-functional-approach-e48ffbbd935b",
