@@ -50,6 +50,18 @@ scalaVersion := "2.12.8"
 name := "simple-spark-deploy"
 version := "0.1"
 
+// to change the logging level for compilation 
+// to only show warnings and errors:
+//> set 
+logLevel in compile := Level.Warn
+// To enable debug logging for all tasks in the current project,
+//> set logLevel := Level.Warn
+// to show stack traces up to the first sbt frame:
+//> set every traceLevel := 0
+//> set traceLevel in Test := 5
+//> set traceLevel in update := 0
+//> set traceLevel in ThisProject := -1
+
 //val sparkVersion = "2.2.0"
 val sparkVersion = "2.4.1"
 // taken [from](https://github.com/phatak-dev/spark2.0-examples/blob/master/build.sbt) 
@@ -90,3 +102,9 @@ testFrameworks += new TestFramework(
 // for the JVM
 //?libraryDependencies += "io.monix" %% "monix" % "3.0.0-RC2"
 
+// Using Log4j in your SBT build
+//?libraryDependencies += "log4j" % "log4j" % "1.2.14"
+//libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.11.2"
+//libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.11.2"
+// A convenient Scala wrapper for the Logger API.
+//libraryDependencies += "org.apache.logging.log4j" %% "log4j-api-scala" % "11.0"

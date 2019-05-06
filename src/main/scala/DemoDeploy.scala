@@ -5,6 +5,10 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
 import org.apache.spark.rdd.RDD
+
+import java.net.URL
+
+import org.apache.log4j.{ LogManager, Level, PropertyConfigurator }
 /*
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.internal.Logging
@@ -30,6 +34,10 @@ object StreamingExamples extends Logging {
 }
 */
 
+/**
+> show compile:discoveredMainClasses
+[info] * demodeploy.DemoDeploy
+*/
 object DemoDeploy {
     /*
     sbt:simple-spark-deploy> run
@@ -44,6 +52,48 @@ object DemoDeploy {
     use sc.setLogLevel(newLevel). 
     For SparkR, use setLogLevel(newLevel).
     */
+    /*
+String appName
+        // InputStream inStreamLog4j = getClass().getResourceAsStream("/log4j.properties");
+
+        String propFileName = appName + ".log4j.properties";
+        File f = new File("./" + propFileName);
+        if (f.exists()) {
+
+            try {
+                InputStream inStreamLog4j = new FileInputStream(f);
+                Properties propertiesLog4j = new Properties();
+
+                propertiesLog4j.load(inStreamLog4j);
+                PropertyConfigurator.configure(propertiesLog4j);
+            } catch (Exception e) {
+                e.printStackTrace();
+                BasicConfigurator.configure();
+            }
+        } else {
+            BasicConfigurator.configure();
+        }
+    */
+    /*
+    val propertiesName: String = "./src/main/resources/log4j.properties"
+    // not found in './src/main/resources' ?
+    // <scheme>://<authority><path>?<query>#<fragment>
+    val log_Config: URL = ClassLoader.getSystemResource(propertiesName)
+    //assertNotNull("missing configuration: " + propertiesName, log_Config)
+    // java.lang.AssertionError: assertion failed: configuration file ./src/main/resources/log4j.properties not found
+    assert( 
+        //log_Config != null, 
+        Option(log_Config).nonEmpty, 
+        s"configuration file ${propertiesName} not found " 
+    )
+    */
+    // this affects Spark logging ?
+    //LogManager.resetConfiguration()
+    // log4j:ERROR Could not read configuration file from URL [null]
+    // this affects Spark logging when 'configure' fails
+    //PropertyConfigurator.configure( log_Config )
+    // it works but has no noticible effect 
+    //PropertyConfigurator.configure("src/main/resources/log4j.properties")
     /* 
     $ ./sbin/start-master.sh
 starting org.apache.spark.deploy.master.Master, logging to /home/gluk-alex/Documents/projects/turing.com/spark-2.4.1-bin-hadoop2.7/logs/spark-gluk-alex-org.apache.spark.deploy.master.Master-1-glukalex-desktop.out
@@ -77,6 +127,25 @@ stopping org.apache.spark.deploy.master.Master
     val sc = new SparkContext(conf)
     // newLevel
     //sc.setLogLevel("WARN")
+    
+    /*
+The class org.apache.log4j.Logger is not serializable 
+which implies we cannot use it inside a closure 
+while doing operations on some parts of the Spark API.
+
+noted 
+how the log object has been marked as @transient 
+which allows the serialization system to ignore the log object.
+    */
+    @transient lazy val c_Log = org.apache.log4j.LogManager.getLogger("Spark_Closure_Logger")
+    val log = LogManager.getRootLogger
+    
+    //>log.setLevel(Level.WARN)
+    //?LogManager.getLogger("DAGScheduler").setLevel(Level.WARN)
+    //?LogManager.getLogger("SparkContext").setLevel(Level.WARN)
+    
+    log.warn("Hello demo")
+    
     println("====DEMO DEPLOY====")
 
     val text = List(
@@ -85,8 +154,12 @@ stopping org.apache.spark.deploy.master.Master
         |is being replaced 
         |by a new generation 
         |of memory-based processing frameworks, 
-        |the most popular of which is Spark.""".stripMargin, 
+        |the most popular of which is Spark."""
+            //?.stripLineEnd
+            .stripMargin, 
         "Spark supports Scala, Java, Python, and R."
+            //.stripLineEnd
+            //.stripMargin
     )
     /*
     Text file RDDs can be created 
@@ -174,9 +247,17 @@ res24: Long = 100001
     val totalLength = lineLengths.reduce((a, b) => a + b)
     */
     val counts = rdd
-        /// @toDo: pass data retrieval and statistics extractor(s) function(s) in the driver program
+        /// @toDo: pass data retrieval 
+        /// and statistics extractor(s) function(s) to | in the driver program
         .flatMap(line => line.split(" "))
-        .map(word => (word, 1))
+        //.filter( word => ??? )
+        //.map( word => word.trim().stripSuffix(",").stripSuffix(".").stripSuffix(":") )
+        .map( word => word
+            .dropWhile( _ == '\n' )
+            .takeWhile( (c: Char) => !Set( '\n', ',', '.', ':' ).contains( c ) ) 
+        )
+        //.map(word => {c_Log.info(s"mapping | counting word:'${word.trim()}'");(word.trim(), 1)})
+        .map(word => {c_Log.info(s"counting word:'${word}'");(word, 1)})
         /// @toDo: add | implement ?
         // Accumulators are variables 
         // that are only “added” to 
@@ -273,5 +354,7 @@ res33: Long = 100000
     in the same program.
     */
     sc.stop()
+    
+    log.warn("I am done")
   }
 }

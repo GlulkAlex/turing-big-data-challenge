@@ -27,6 +27,7 @@
 "https://heather.miller.am/blog/launching-a-spark-cluster-part-2.html#deploying-our-simple-spark-project", 
 
 "locally:spark-2.4.1-bin-hadoop2.7/examples/src/main/scala/org/apache/spark/examples",
+"https://spark.apache.org/examples.html",
 "https://spark.apache.org/docs/latest/spark-standalone.html", 
 "https://spark.apache.org/docs/latest/spark-standalone.html#launching-spark-applications",
 "https://spark.apache.org/docs/latest/spark-standalone.html#monitoring-and-logging", 
@@ -39,6 +40,11 @@
 
 "https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/util/Utils.scala#L462", 
 "https://github.com/apache/spark/blob/39f75b45889951b175c48b2e849e920d0a0eee6e/core/src/main/scala/org/apache/spark/SparkContext.scala#L1511", 
+
+"https://hackernoon.com/how-to-log-in-apache-spark-f4204fad78a",
+"https://hackernoon.com/how-to-log-in-apache-spark-a-functional-approach-e48ffbbd935b",
+"https://medium.com/@spearsear/simple-use-of-cats-writer-monad-4a1694556112",
+"https://jaceklaskowski.gitbooks.io/mastering-apache-spark/spark-logging.html",
 
 "https://en.wikipedia.org/wiki/Lossless_compression",
 
@@ -69,12 +75,28 @@
 "https://www.scala-sbt.org/1.x/docs/Library-Dependencies.html#Managed+Dependencies", 
 "https://www.scala-sbt.org/1.x/docs/Library-Dependencies.html#Getting+the+right+Scala+version+with", 
 "https://www.scala-sbt.org/1.x/docs/Library-Management.html#Dependencies", 
+
 "https://ant.apache.org/ivy/history/2.3.0/ivyfile/dependency.html#revision", 
+
+"https://logging.apache.org/log4j/2.x/maven-artifacts.html",
+"http://logging.apache.org/log4j/scala/log4j-api-scala_2.12/index.html",
+"https://logging.apache.org/log4j/2.x/manual/scala-api.html",
+"https://logging.apache.org/log4j/2.x/manual/configuration.html#ConfigurationSyntax",
+"https://logging.apache.org/log4j/2.x/manual/configuration.html#Properties",
+"https://logging.apache.org/log4j/2.x/manual/customconfig.html",
+"https://logging.apache.org/log4j/2.x/manual/customconfig.html#Configurator",
+"https://logging.apache.org/log4j/2.x/manual/customconfig.html#AddingToCurrent",
+
+"https://www.programcreek.com/java-api-examples/org.apache.log4j.PropertyConfigurator",
+
+"http://discuss.itversity.com/t/setting-up-log4j/5839",
 
 "https://github.com/47deg/LambdaTest/blob/master/lambdatest/src/test/scala/demo/Tag.scala", 
 
 "https://docs.scala-lang.org/overviews/collections/iterators.html", 
 "https://docs.scala-lang.org/overviews/collections/iterators.html#buffered-iterators",
+
+"https://www.programcreek.com/scala/java.util.Properties",
 
 "http://dcjtech.info/topic/python-file-extensions/",
 "https://stackoverflow.com/questions/3260599/how-to-do-multiple-imports-in-python",
