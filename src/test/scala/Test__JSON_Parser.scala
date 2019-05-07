@@ -2,14 +2,19 @@ package big_data
 //package demo
 
 import com.fortysevendeg.lambdatest._
+
 import java.util.Base64
 import java.util.Base64.Decoder
+
+import scala.io.BufferedSource
+
 import JSON_Parser.{ 
     File_Props, get_Field_Name, 
     get_Field_Value, 
     file_Props_Json_Parser, 
     map_File_Props_Json,
-    get_Current_Tree_Children_Props_Iterator
+    get_Current_Tree_Children_Props_Iterator,
+    drop_Chars_While_Word_Not_Found
 }
 import GitHub_Repo_Content.{ 
     repo_Get_File_Content,
@@ -20,7 +25,9 @@ import GitHub_Repo_Content.{
     get_Repo_Files_Paths_Names_Iterator
 }
 
-    
+/** 
+> show test:definedTestNames 
+*/
 class Test_JSON_Parser extends LambdaTest {
 
     //val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
@@ -71,8 +78,42 @@ class Test_JSON_Parser extends LambdaTest {
         assert(3 == 5 - 2, "should work")
         }
     } + */
-    label("Json_Parser Tests") {
-        test("Json object field and name extractors test") {
+    label(
+        "Json_Parser Tests"//, tags = Set( "SKIP" , "ignore" ) 
+    ) {
+        test(
+            "drop_Chars_While_Word_Not_Found test"//, tags = Set( "SKIP" , "ignore" )
+        ) {
+            val actual_Result: BufferedSource = drop_Chars_While_Word_Not_Found(
+                word = "tree",
+                word_Size = 4,
+                chars_Iterator = scala.io.Source.fromFile(
+                    name = "./src/test/resources/response_to_repos_owner_repo_branches_master_url.json", 
+                    enc = "UTF8" 
+                )//.buffered
+            )
+            
+            assert(actual_Result.nonEmpty, "Expected to true") + 
+            assertEq(
+                actual_Result
+                    .take(7)
+// scala> Set( 'a', 'b', 'c' )('a')
+// res4: Boolean = true
+// scala> Set( 'a', 'b', 'c' )('d')
+// res5: Boolean = false
+// scala> Set( 'a', 'b', 'c' ).contains('d')
+// res6: Boolean = false
+                    .filterNot( Set( '\n', '\t', ' ' )( _ ) )
+                    .mkString,
+                    //?.toString(), 
+                //?"\": {\n", 
+                "\":{",
+                "Expected to be equal"
+            )
+        } + 
+        test(
+            "Json object field and name extractors test"//, tags = Set( "SKIP" , "ignore" )
+        ) {
             println( "#" * 80 )
             println( "test_Input_1:" )
             println( test_Input_1 )
@@ -99,7 +140,9 @@ class Test_JSON_Parser extends LambdaTest {
             assertEq(f_1_N, "name", "Expected to be equal") + 
             assertEq(f_1_V, "symbols.py", "Expected to be equal")
         } + 
-        test("Extract file_Props") {
+        test(
+            "Extract file_Props"//, tags = Set( "SKIP" , "ignore" ) 
+        ) {
             println( "Parsing test_Input:" )
             //println( test_Input )
             println( "Results:" )
@@ -121,7 +164,9 @@ class Test_JSON_Parser extends LambdaTest {
             
             assertEq(extracted_Props, expected_Result, "Expected to be equal")
         } + 
-        test("Map file_Props") {
+        test(
+            "Map file_Props"//, tags = Set( "SKIP" , "ignore" ) 
+        ) {
             val extracted_Props = map_File_Props_Json(
                 scala.io.Source.fromFile(
                     name = "./src/test/resources/test_input_1.json", 
@@ -148,8 +193,12 @@ class Test_JSON_Parser extends LambdaTest {
             )
         } 
     } + 
-    label("Content Json Tests", tags = Set( /*"ignore"*/ ) ) {
-        test("get encoded file Content", tags = Set( "ignore" )) {
+    label(
+        "Content Json Tests"//, tags = Set( "ignore" ) 
+    ) {
+        test(
+            "get encoded file Content", tags = Set( "ignore" )
+        ) {
             val encoded_File_Content: String = repo_Get_File_Content( 
                 owner = "pirate",//"BugScanTeam",
                 repository_Name = "crypto-trader",//"DNSLog",
@@ -168,7 +217,9 @@ class Test_JSON_Parser extends LambdaTest {
             
             assertEq(content_Base64, encoded_File_Content, "Expected to be equal")
         } + 
-        test("decode file Content", tags = Set( "ignore" )) {
+        test(
+            "decode file Content", tags = Set( "ignore" )
+        ) {
             val file_Content_Url = "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py"
             val extracted_Props = map_File_Props_Json(
                 scala.io.Source
@@ -212,13 +263,15 @@ class Test_JSON_Parser extends LambdaTest {
             )
         }
     } + // get_Repo_Owner_And_Name_From_URL
-    label("Utils Tests") {
+    label(
+        "Utils Tests"//, tags = Set( "SKIP" , "ignore" ) 
+    ) {
         test("extract Repo_Owner_And_Name_From_URL Test") {
             val url = "https://github.com/BugScanTeam/DNSLog"
             val ( owner, name ) = get_Repo_Owner_And_Name_From_URL( url )
         
             assertEq( owner, "BugScanTeam", "Expected to be equal") +
-            assertEq(name, "DNSLog", "Expected to be equal")
+            assertEq( name, "DNSLog", "Expected to be equal")
             //assert(3 == 5 - 2, "should work")
         } + 
         test("get Repos urls From CSV file Test") {
@@ -233,7 +286,9 @@ class Test_JSON_Parser extends LambdaTest {
             val repos_URLs_Iterator: collection.Iterator[String] = repos_URLs_BufferedSource
                 .getLines()
             val csv_Header: String = repos_URLs_Iterator.next()
-            val top_9_Repos_List: List[String] = repos_URLs_Iterator.take(9).toList
+            val top_9_Repos_List: List[String] = repos_URLs_Iterator
+                .take(9)
+                .toList
             
             assertEq( 
                 csv_Header, 
@@ -251,21 +306,28 @@ class Test_JSON_Parser extends LambdaTest {
                 "Expected to be equal" 
             )
         } + 
-        test("get_Repo_Master_Tree_Root_URL Test") {
+        test(
+            "get_Repo_Master_Tree_Root_URL Test", tags = Set( "SKIP" , "ignore" ) 
+        ) {
             assertEq( 
-                get_Repo_Master_Tree_Root_URL(), 
+                get_Repo_Master_Tree_Root_URL(
+                    master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
+                ).get, 
                 "https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724",
                 "Expected to be equal" 
             ) + 
             assertEq( 
                 get_Repo_Master_Tree_Root_URL(
                     master_Url = "https://api.github.com/repos/bitly/data_hacks/branches/master"
-                ),
+                ).get,
                 "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439",
                 "Expected to be equal" 
             )
         } + 
-        test("get_Current_Tree_Children_Props_Iterator Test") {
+        test(
+            "get_Current_Tree_Children_Props_Iterator Test"//, 
+            //tags = Set( "SKIP" , "ignore" ) 
+        ) {
             val trees_BufferedSource: scala.io.BufferedSource = scala.io.Source
                 .fromFile(
                     name = "./src/test/resources/repo_git_trees_url_response.json", 
@@ -307,10 +369,12 @@ class Test_JSON_Parser extends LambdaTest {
                 "Expected to be equal" 
             ) 
         } + 
-        test("get_Repo_Files_Paths_Names_Iterator Test") {
-            val repo_Files_Iter = get_Repo_Files_Paths_Names_Iterator(
+        test(
+            "get_Repo_Files_Paths_Names_Iterator Test", tags = Set( "SKIP" , "ignore" ) 
+        ) {
+            val ( repo_Files_Iter, repo_Files_Iter_Copy ) = get_Repo_Files_Paths_Names_Iterator(
                 repo_URL = "https://github.com/bitly/data_hacks"
-            )
+            ).duplicate
             /*
 $ tar -tf data_hacks__repo.tar.gz
 bitly-data_hacks-c66693b/
@@ -361,6 +425,14 @@ tree_Children_Iterators_Stack.isEmpty: List()
             assertEq( 
                 repo_Files_Iter.hasNext, 
                 true,
+                "Expected to be equal" 
+            ) + 
+            assertEq( 
+                // TraversableOnce ?
+                repo_Files_Iter_Copy
+                    //.toMap
+                    .size, 
+                expected.size,
                 "Expected to be equal" 
             ) + 
             assertEq( 
