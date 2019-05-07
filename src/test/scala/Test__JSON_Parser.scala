@@ -14,7 +14,9 @@ import JSON_Parser.{
     file_Props_Json_Parser, 
     map_File_Props_Json,
     get_Current_Tree_Children_Props_Iterator,
-    drop_Chars_While_Word_Not_Found
+    drop_Chars_While_Word_Not_Found,
+    take_Until_Char,
+    skip_After_Char
 }
 import GitHub_Repo_Content.{ 
     repo_Get_File_Content,
@@ -108,6 +110,42 @@ class Test_JSON_Parser extends LambdaTest {
                     //?.toString(), 
                 //?"\": {\n", 
                 "\":{",
+                "Expected to be equal"
+            )
+        } + 
+        test(
+            "extract url with drop_Chars_While_Word_Not_Found test"//, tags = Set( "SKIP" , "ignore" )
+        ) {
+            val after_Tree: BufferedSource = drop_Chars_While_Word_Not_Found(
+                word = "tree",
+                word_Size = 4,
+                chars_Iterator = scala.io.Source.fromFile(
+                    name = "./src/test/resources/response_to_repos_owner_repo_branches_master_url.json", 
+                    enc = "UTF8" 
+                )//.buffered
+            )
+            val after_Url: BufferedSource = drop_Chars_While_Word_Not_Found(
+                word = "url",
+                word_Size = 3,
+                chars_Iterator = after_Tree
+            )
+            // mutate
+            skip_After_Char( 
+                stop_At = ':',
+                chars_Iterator = after_Url
+            )
+            skip_After_Char( 
+                stop_At = '"',
+                chars_Iterator = after_Url
+            )
+            val actual_Result: String = take_Until_Char( 
+                stop_At = '"', 
+                chars_Iterator = after_Url
+            )
+            
+            assertEq(
+                actual_Result,
+                "https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724",
                 "Expected to be equal"
             )
         } + 
