@@ -1,5 +1,8 @@
 package big_data
 
+import scala.io.BufferedSource
+
+
 /**
 it has to try to parse (valid) json 
 or fail miserably in the process
@@ -66,6 +69,94 @@ and Json arrays are represented as
     List[Any]
 */
 object JSON_Parser {
+    /** 
+    main operation is to 
+    compare current_Buffer with 
+    word prefix 
+    until both are identical 
+    so it has to be fast 
+    not just linear scan 
+    
+    something similar DNA strings matching dynamic algorithms 
+    example:
+      "abc"
+          "abc"
+                    "abc"
+    "dfagkgabgklbctyoabcdfg"
+                     ___
+    */
+    @scala.annotation.tailrec
+    def drop_Chars_While_Word_Not_Found( 
+        // must support fast [append | push right] and fast [tail | pop left]
+        // or pop-push in one step | operation 
+        // or word sized rotating collection - get last -> drop first 
+// scala> val sb = new StringBuilder(capacity = 3)
+// sb: StringBuilder =
+// scala> sb.append('a')
+// res5: StringBuilder = a
+// scala> sb.append('b')
+// res6: StringBuilder = ab
+// scala> sb.append('c')
+// res7: StringBuilder = abc
+// scala> sb.append('d')
+// res8: StringBuilder = abcd
+// scala> sb.tail
+// res9: StringBuilder = bcd
+// scala> sb.head
+// res10: Char = a
+// scala> sb == "abcd"
+// res11: Boolean = false
+// scala> sb.result() == "abcd"
+// res12: Boolean = true
+        // keeping it just for debugging | checking of correctness 
+        current_Buffer: String = "", 
+        buffer_Size: Int = 0,
+        word: String,// = "tree",
+        word_Size: Int,// = 4
+        last_Matched_Char_Index: Int = -1,
+        // mutated state 
+        chars_Iterator: scala.io.BufferedSource
+    ): BufferedSource = if( 
+        //current_Buffer == word 
+        buffer_Size == word_Size
+        || chars_Iterator.isEmpty 
+    ){
+        chars_Iterator
+    }else{
+        if( chars_Iterator.hasNext ){
+            val current_Char: Char = chars_Iterator.next()
+            // char java.lang.String.charAt(int index)
+            //  Returns the char value at the specified index.
+            val word_Next_Char: Char = word.charAt(last_Matched_Char_Index + 1)
+            
+            val (
+                next_Buffer,
+                next_Buffer_Size,
+                next_Matched_Char_Index
+            ) = if( current_Char == word_Next_Char ){
+                (
+                    current_Buffer + current_Char,
+                    buffer_Size + 1,
+                    last_Matched_Char_Index + 1
+                )
+            }else{
+                // reset 
+                ( "", 0, -1 )
+            }
+            
+            drop_Chars_While_Word_Not_Found( 
+                current_Buffer = next_Buffer, 
+                buffer_Size = next_Buffer_Size,
+                word = word,
+                word_Size = word_Size,
+                last_Matched_Char_Index = next_Matched_Char_Index,
+                chars_Iterator = chars_Iterator
+            )
+        }else{
+            // empty
+            chars_Iterator
+        }
+    }
     /**
     */
     case class File_Props(

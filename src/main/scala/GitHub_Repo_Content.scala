@@ -17,6 +17,7 @@ import scalaj.http.HttpResponse
 import cats.data.NonEmptyList 
 
 import scala.util.{ Try, Success, Failure }
+import scala.io.{ Source, BufferedSource }
 
 import JSON_Parser.{ 
 //     File_Props, get_Field_Name, 
@@ -100,11 +101,15 @@ There are a number of sub-status error codes
 that provide a more specific reason 
 for responding with the 403 status code.
 */
-    /** from response JSON */
+    /** from response JSON 
+    return:
+        'repo_Master_Tree_Root_URL' if succeeded 
+        [ empty string | Option[ String ] | "" & error message ] when fails ?
+    */
     @throws(classOf[java.io.IOException])
     def get_Repo_Master_Tree_Root_URL(
-        master_Url: String = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
-    ): String = {
+        master_Url: String// = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
+    ): Option[ String ] = {
         // scala.io.Codec -> final val UTF8: Codec
         // scala.io.Source.
         //  fromURL(url: URL, enc: String): BufferedSource
@@ -138,11 +143,26 @@ for responding with the 403 status code.
         // public final InputStream openStream() throws IOException
         // java.io.IOException
         // get JSON from github API
-        val github_API_Response_Source: scala.io.BufferedSource = scala.io.Source
-            .fromURL(s = master_Url, enc = "UTF8" )
+        val github_API_Response_Source: Try[scala.io.BufferedSource] = Try(
+        scala.io.Source
+            .fromURL(s = master_Url, enc = "UTF8" ) 
+        )
+        
         /// @toDo: it can be done in one scan without splitting 
         //>println( github_API_Response_Source.mkString )
-        val repo_Master_Tree_Root_URL: String = github_API_Response_Source
+        /*
+        "tree": {
+            "sha": "26e721b5e45fab0b7ba722e56136fef58a696724",
+            "url": "https://api.github.com/repos/pirate/crypto-trader/git/trees/26e721b5e45fab0b7ba722e56136fef58a696724"
+        },
+        drop until "tree" field
+        then take "sha" or "url" value 
+        */
+        val repo_Master_Tree_Root_URL: Option[ String ] = 
+        github_API_Response_Source match {
+            // response content 
+            case Success(r_C) => { 
+            val url: String = r_C
             //?.getLines()
             // startsWith(String prefix)
             //.dropWhile( _.trim().startsWith("\"tree\"") )
@@ -160,10 +180,20 @@ for responding with the 403 status code.
             .head
             .drop(7)
             .stripSuffix("\"}")
+                // clean up ? releasing resource ? 
+                //github_API_Response_Source
+                r_C
+                    .close()
+                
+                Some( url )
+            }
+            // type Throwable = java.lang.Throwable
+            // String   Throwable.getMessage()
+            //  Returns the detail message string of this throwable.
+            case Failure(e) => None//Iterator[String]()
+        }
             
         println( s"repo_Master_Tree_Root_URL: ${repo_Master_Tree_Root_URL}" )
-        // clean up ? releasing resource ? 
-        github_API_Response_Source.close()
         
         repo_Master_Tree_Root_URL
     }
@@ -216,10 +246,12 @@ res7: Int = 4
     */
     def get_Repo_Files_Paths_Names_Iterator( 
         // constructor parameter
-        repo_URL: String = "https://github.com/bitly/data_hacks",
+        repo_URL: String,// = "https://github.com/bitly/data_hacks",
         has_Suffix: String = ".py",
         is_DeBug_Mode: Boolean = 1 == 0
-    ): Iterator[ ( String, String ) ] = new scala.collection.AbstractIterator[ ( String, String ) ]{
+    ): Iterator[ ( String, String ) ] = new scala.collection.AbstractIterator[ 
+        ( String, String ) 
+    ]{
         // root source ?
         //val master_Url = "https://api.github.com/repos/pirate/crypto-trader/branches/master"
         // from master_Url.commit.commit.tree.url: 
@@ -244,9 +276,10 @@ res7: Int = 4
         // response["content"] = "Lm15cHlfY2FjaGUvCnNlY3JldHMucHkKZGF0YS8KbWlzYy8K\n"
         val ( owner, name ) = get_Repo_Owner_And_Name_From_URL( repo_URL )
         val master_Url = s"https://api.github.com/repos/${owner}/${name}/branches/master"
+        /// @toDo: handle failure here by using retry strategy ?
         val master_Tree_Root_URL: String = get_Repo_Master_Tree_Root_URL(
             master_Url = master_Url
-        )
+        ).getOrElse("")
         /// @Done: store | maintain stack of 
         /// get_Current_Tree_Children_Props_Iterator(s)
         /// as hasNext stop condition 
@@ -254,6 +287,7 @@ res7: Int = 4
         //var hasnext = true
         var tree_Children_Iterators_Stack = List(
             get_Current_Tree_Children_Props_Iterator( 
+                /// @toDo: handle failure here by using retry strategy ?
                 github_API_Response_Buffered_Source = scala.io.Source
                     .fromURL(
                         s = master_Tree_Root_URL, 
