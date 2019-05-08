@@ -1,4 +1,4 @@
-package demodeploy
+package big_data//demodeploy
 
 //import org.apache.spark.SparkConf
 //import org.apache.spark.SparkContext
@@ -15,6 +15,7 @@ import org.apache.spark.rdd.RDD
 //import org.apache.spark.sql.SparkSession
 
 import java.net.URL
+import java.io.{ File, PrintWriter }
 
 import org.apache.log4j.{ LogManager, Level, PropertyConfigurator }
 /*
@@ -41,10 +42,20 @@ object StreamingExamples extends Logging {
   }
 }
 */
+import GitHub_Repo_Content.{ 
+    /*repo_Get_File_Content,
+    decode_Base64_Content, 
+    drop_Empty_Lines_And_Trailing_Spaces_From_Content, 
+    get_Repo_Owner_And_Name_From_URL,
+    get_Repo_Master_Tree_Root_URL,*/
+    get_Repo_Files_Paths_Names_Iterator
+}
+
 
 /**
 > show compile:discoveredMainClasses
 [info] * demodeploy.DemoDeploy
+> runMain demodeploy.DemoDeploy
 */
 object DemoDeploy {
     /*
@@ -233,7 +244,6 @@ distFile_RDD: org.apache.spark.rdd.RDD[String] = ../url_list.csv MapPartitionsRD
     ---
 scala> distFile_RDD.take(1)
 res16: Array[String] = Array(URLs)
-
 scala> distFile.collect()
 res19: Array[String] = Array(URLs, https://github.com/bitly/data_hacks, https...
 scala> distFile.take(2)
@@ -245,9 +255,49 @@ res23: String = https://github.com/bitly/data_hacks
 scala> distFile.count()
 res24: Long = 100001
     */
-    val rdd = sc.parallelize(text)
+    val repos_RDD = sc
+        .textFile("url_list.csv")
+        .filter( _ != "URLs" )
+        .map( url => {
+            val files_SHA = get_Repo_Files_Paths_Names_Iterator( repo_URL = url )
+            //?.toMap
+            .map{ case ( file, sha ) => s"""\"${file}\": \"${sha}\"""" }
+            .mkString( "[ ", ", ", " ]" )
+            // return:
+            s"""{ \"repo\": \"${url}\", \"files\": ${files_SHA} },""" 
+            } 
+        )
+    
+    val f_writer = new PrintWriter( new File("result.json" ) )
+    /// @toDo: fails for more because of requests rate restrictions to GitHub API ?
+    val batch_Size: Int = 2//3
+    
+    f_writer.println("[")
+    /// @toDo: ? handle last trailing comma ',' in list items ?
+    repos_RDD
+        //.collect()
+        .take( batch_Size )
+        .foreach( 
+            f_writer
+                .println 
+                // or
+                //>.write
+        )
+    f_writer.write("]")
+    // clean up 
+    f_writer.close()
+    
+    if( 1 == 0 ){
+    // def parallelize[T](seq: Seq[T], numSlices: Int = defaultParallelism)(implicit arg0: ClassTag[T]): RDD[T]
+    //  Distribute a local Scala collection to form an RDD.
+    val rdd = sc
+        .parallelize(text)
     /*
+    // returns: RDD of lines of the text file
     val lines = sc.textFile("data.txt")
+    // to drop CSV header 
+    // def RDD.filter(f: (T) ⇒ Boolean): RDD[T]
+    //  Return a new RDD containing only the elements that satisfy a predicate.
     val lineLengths = lines.map(s => s.length)
     // If we also wanted to use lineLengths again later, 
     // we could add:
@@ -281,6 +331,7 @@ res24: Long = 100001
         // path
         //.saveAsTextFile( "result.json" )
         //.collect()
+    //}
     /*
     To print all elements on the driver, 
     one can use the collect() method 
@@ -297,7 +348,8 @@ res24: Long = 100001
     if( 1 == 0 ){ 
     counts
         .collect()
-        .foreach( println )}
+        .foreach( println )
+    }
     /// @toDo: check directory existance and remove it ?
     /// @toDo: lame solution @removeIt altogether 
     counts
@@ -327,7 +379,7 @@ res24: Long = 100001
     */
     sc.stop()
     }
-    
+    }
 //     def data_Frame_Example(): Unit = {
 //     
 //         val spark = SparkSession

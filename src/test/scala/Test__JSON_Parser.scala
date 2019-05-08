@@ -366,6 +366,8 @@ class Test_JSON_Parser extends LambdaTest {
             "get_Current_Tree_Children_Props_Iterator Test"//, 
             //tags = Set( "SKIP" , "ignore" ) 
         ) {
+            /// @toDo: test for "https://github.com/kevinburke/hamms" 
+            /// because it finds only files from one directory | folder but not all of them
             val trees_BufferedSource: scala.io.BufferedSource = scala.io.Source
                 .fromFile(
                     name = "./src/test/resources/repo_git_trees_url_response.json", 
