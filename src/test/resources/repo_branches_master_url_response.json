@@ -1,0 +1,102 @@
+{
+  "name": "master",
+  "commit": {
+    "sha": "c66693bc41299691974868557e9d7f4b30f2b3cd",
+    "node_id": "MDY6Q29tbWl0OTQ2ODI0OmM2NjY5M2JjNDEyOTk2OTE5NzQ4Njg1NTdlOWQ3ZjRiMzBmMmIzY2Q=",
+    "commit": {
+      "author": {
+        "name": "Jehiah Czebotar",
+        "email": "jehiah@gmail.com",
+        "date": "2018-03-13T21:08:36Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2018-03-13T21:08:36Z"
+      },
+      "message": "Merge pull request #44 from genevera/patch-1\n\nRemoves UUOC from README.markdown",
+      "tree": {
+        "sha": "994b441daecddd98c3b313a288c1ae0611e56439",
+        "url": "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439"
+      },
+      "url": "https://api.github.com/repos/bitly/data_hacks/git/commits/c66693bc41299691974868557e9d7f4b30f2b3cd",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsBcBAABCAAQBQJaqD3UCRBK7hj4Ov3rIwAAdHIIADdSIL8oER3rsnVLUKITgPe6\nAzB6Z47xVuB7EGNZDAf5IileIoGGeEKkIusVQme99R74tLrZw/+/JLr9m40PCHK3\n+dUSg7kR+ApJ7KGNZKhqPzcJq01grtpOx2mBY1t6t0ArYziiMmuoEfswZjCQbII6\nlCKlfnmRXCl8vv+eE3YDlmFE+KlqGeAb5Fom8Njm3Jz5c2iQ3gWNFOp1sfxbC1Kl\np47HJHYLEG0/ULTNJ+To1z8qZqYuNy+KKe/s2NknUXkWxzHIH6tetq8sLXwjq8j/\nUI63vvtKGyP9Bl16sh0lorOR8A63rD5JJA6S9wtxsvHxRi0NDLvs4F7sws0TCQk=\n=l1jl\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree 994b441daecddd98c3b313a288c1ae0611e56439\nparent f5e933f820cca9c1d8a0605722026fd70ee04233\nparent 0796de1bd3a741b81e887f234df0bf112644ff10\nauthor Jehiah Czebotar <jehiah@gmail.com> 1520975316 -0400\ncommitter GitHub <noreply@github.com> 1520975316 -0400\n\nMerge pull request #44 from genevera/patch-1\n\nRemoves UUOC from README.markdown"
+      }
+    },
+    "url": "https://api.github.com/repos/bitly/data_hacks/commits/c66693bc41299691974868557e9d7f4b30f2b3cd",
+    "html_url": "https://github.com/bitly/data_hacks/commit/c66693bc41299691974868557e9d7f4b30f2b3cd",
+    "comments_url": "https://api.github.com/repos/bitly/data_hacks/commits/c66693bc41299691974868557e9d7f4b30f2b3cd/comments",
+    "author": {
+      "login": "jehiah",
+      "id": 45028,
+      "node_id": "MDQ6VXNlcjQ1MDI4",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/45028?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jehiah",
+      "html_url": "https://github.com/jehiah",
+      "followers_url": "https://api.github.com/users/jehiah/followers",
+      "following_url": "https://api.github.com/users/jehiah/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jehiah/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jehiah/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jehiah/subscriptions",
+      "organizations_url": "https://api.github.com/users/jehiah/orgs",
+      "repos_url": "https://api.github.com/users/jehiah/repos",
+      "events_url": "https://api.github.com/users/jehiah/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jehiah/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "f5e933f820cca9c1d8a0605722026fd70ee04233",
+        "url": "https://api.github.com/repos/bitly/data_hacks/commits/f5e933f820cca9c1d8a0605722026fd70ee04233",
+        "html_url": "https://github.com/bitly/data_hacks/commit/f5e933f820cca9c1d8a0605722026fd70ee04233"
+      },
+      {
+        "sha": "0796de1bd3a741b81e887f234df0bf112644ff10",
+        "url": "https://api.github.com/repos/bitly/data_hacks/commits/0796de1bd3a741b81e887f234df0bf112644ff10",
+        "html_url": "https://github.com/bitly/data_hacks/commit/0796de1bd3a741b81e887f234df0bf112644ff10"
+      }
+    ]
+  },
+  "_links": {
+    "self": "https://api.github.com/repos/bitly/data_hacks/branches/master",
+    "html": "https://github.com/bitly/data_hacks/tree/master"
+  },
+  "protected": false,
+  "protection": {
+    "enabled": false,
+    "required_status_checks": {
+      "enforcement_level": "off",
+      "contexts": [
+
+      ]
+    }
+  },
+  "protection_url": "https://api.github.com/repos/bitly/data_hacks/branches/master/protection"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "symbols.py",
+  "path": "symbols.py",
+  "sha": "248ffb14ea2899491d92f40c4d17586102604efa",
+  "size": 6824,
+  "url": "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py?ref=master",
+  "html_url": "https://github.com/pirate/crypto-trader/blob/master/symbols.py",
+  "git_url": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa",
+  "download_url": "https://raw.githubusercontent.com/pirate/crypto-trader/master/symbols.py",
+  "type": "file",
+  "content": "IiIiCkN1cnJlbmN5IHR5cGVzIGFzIGRlZmluZWQgaGVyZToKICAgIGh0dHBz\n...ICAgICAgICAgICAgICAgICAgICAgCicnJywKfQo=\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/pirate/crypto-trader/contents/symbols.py?ref=master",
+    "git": "https://api.github.com/repos/pirate/crypto-trader/git/blobs/248ffb14ea2899491d92f40c4d17586102604efa",
+    "html": "https://github.com/pirate/crypto-trader/blob/master/symbols.py"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "sha": "994b441daecddd98c3b313a288c1ae0611e56439",
+  "url": "https://api.github.com/repos/bitly/data_hacks/git/trees/994b441daecddd98c3b313a288c1ae0611e56439",
+  "tree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d0b71a3c79d2d3afbfa99269fea4280f5e73344",
+      "size": 11,
+      "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/9d0b71a3c79d2d3afbfa99269fea4280f5e73344"
+    },
+    {
+      "path": "README.markdown",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "053dae1ad11e6b864a97031430abd4d470c0ea34",
+      "size": 3941,
+      "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/053dae1ad11e6b864a97031430abd4d470c0ea34"
+    },
+    {
+      "path": "data_hacks",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4cf5df18ec0052abf4d561c992f138ac144f8304",
+      "url": "https://api.github.com/repos/bitly/data_hacks/git/trees/4cf5df18ec0052abf4d561c992f138ac144f8304"
+    },
+    {
+      "path": "setup.py",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "36fa158820c95e26d816f8f1bbfd962e1a482df9",
+      "size": 850,
+      "url": "https://api.github.com/repos/bitly/data_hacks/git/blobs/36fa158820c95e26d816f8f1bbfd962e1a482df9"
+    }
+  ],
+  "truncated": false
+}
